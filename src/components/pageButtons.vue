@@ -1,6 +1,6 @@
 <template>
   <div class="pageBtnContainer">
-    <button v-for="item in page" :key="item.number" :class="['pageBtn', (currentPage === item ? 'active' :
+    <button v-for="item in page" :key="item.number" :class="['pageBtn', (currentPage === item.number ? 'active' :
     '')]" @click="select(item)">{{ item.number }}</button>
   </div>
 </template>
@@ -11,8 +11,7 @@ export default {
     page: {
       type: Array,
       default: () => [{}]
-    },
-    clickHandler: ""
+    }
   },
   data() {
     return {
@@ -21,7 +20,7 @@ export default {
   },
   methods: {
     select(reponse) {
-      this.currentPage = reponse;
+      this.currentPage = reponse.number;
       this.$emit("pageSelected", reponse);
     }
   }

@@ -7,8 +7,11 @@
     <h1>{{extObj.title}}</h1>
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
+    
     <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+      
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
+      
       <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
       
       <PillButtons @responseInput="questions.lnkQuestion = $event" v-if="questions.type=='LISTE'"
@@ -18,9 +21,12 @@
       :responsesChoices="questions.response" />
       
       <Datepicker v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" :language="fr" />
-      <input type="Number" v-if="questions.type=='NUM'" :value=""/>
+      
+      <input type="Number" v-if="questions.type=='NUM'"/>
+      
       <VueSignature v-if="questions.type=='CAPTURE'" id="signature"
       ref="signaturePad" height="200px" width="50%" />
+      
       <textarea v-if="questions.type=='MEMO'" />
 
       </QuestionHolder>
@@ -42,6 +48,7 @@ import { fr } from "vuejs-datepicker/dist/locale";
 import VueSignature from "vue-signature-pad";
 
 export default {
+  remoteUse : true,
   name: "App",
   components: {
     PageButtons,
@@ -61,7 +68,7 @@ export default {
   },
   methods: {
     page(currentPage) {
-      this.rootPage = currentPage;
+      this.rootPage = currentPage.number;
     },
     update(value) {
       console.log(value)
@@ -70,7 +77,7 @@ export default {
   mounted() {
     this.$http
       .get(
-        "http://localhost/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
+        "http://"+ (this.remoteUse ? 'localhost':'pno-pc.levallois.eudoweb.com') +"/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
       )
       .then(response => {
         this.extObj = response.data;
