@@ -1,10 +1,10 @@
 
 <template>
-<transition name="component-slide" mode="out-in">
+
     <div class="pageHolder" :id="page.number" @click="select(page.number)">
       <slot></slot>
   </div>
-</transition>
+
 </template>
 
 <script>
@@ -26,10 +26,4 @@ export default {
 </script>
 
 <style>
-.slide-enter-active, .slide-leave-active {
-  transition: transform .5s;
-}
-.slide-enter, .slide-leave-to /* .slide-leave-active below version 2.1.8 */ {
-  transform:translateX(-5em);
-}
 </style>

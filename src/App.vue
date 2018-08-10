@@ -8,7 +8,7 @@
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
     
-    <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+    <PageHolder v-if="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
       
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
       
@@ -20,8 +20,8 @@
       <CheckBoxes @responseInput="questions.lnkQuestion = $event" v-if="questions.type=='MULTI'"
       :responsesChoices="questions.response" />
       
-      <Datepicker v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" :language="fr" />
-      
+      <Datepicker v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" v-model="dateInput" @change="upDate" :language="fr" />
+
       <input type="Number" v-if="questions.type=='NUM'"/>
       
       <VueSignature v-if="questions.type=='CAPTURE'" id="signature"
@@ -32,7 +32,7 @@
       </QuestionHolder>
 
     </PageHolder>
-
+  
   </div>
 
 </template>
@@ -61,6 +61,7 @@ export default {
   },
   data() {
     return {
+      dateInput:null,
       extObj: {},
       rootPage: 1,
       fr: fr
@@ -70,11 +71,12 @@ export default {
     page(currentPage) {
       this.rootPage = currentPage.number;
     },
-    update(value) {
-      console.log(value)
+    update() {
+      console.log('youpi')
     }
   },
   mounted() {
+    
     this.$http
       .get(
         "http://"+ (this.remoteUse ? 'localhost':'pno-pc.levallois.eudoweb.com') +"/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
@@ -166,7 +168,7 @@ div.questionsHolder > textarea {
   text-align: center;
   font-size: 1.4em;
   padding: 0.2em;
-    font-weight: bold;
+  font-weight: bold;
   color: #636363;
 }
 
