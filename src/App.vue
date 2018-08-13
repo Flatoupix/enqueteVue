@@ -7,32 +7,29 @@
     <h1>{{extObj.title}}</h1>
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
-    
-    <PageHolder v-if="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
-      
-      <div class="themeTitle">{{ page.questions[0].theme }}</div>
-      
-      <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
-      
-      <PillButtons @responseInput="questions.lnkQuestion = $event" v-if="questions.type=='LISTE'"
-      :responsesChoices="questions.response" />
-      
-      <CheckBoxes @responseInput="questions.lnkQuestion = $event" v-if="questions.type=='MULTI'"
-      :responsesChoices="questions.response" />
-      
-      <Datepicker v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" v-model="dateInput" @change="upDate" :language="fr" />
 
-      <input type="Number" v-if="questions.type=='NUM'"/>
-      
-      <VueSignature v-if="questions.type=='CAPTURE'" id="signature"
-      ref="signaturePad" height="200px" width="50%" />
-      
-      <textarea v-if="questions.type=='MEMO'" />
+    <PageHolder v-if="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+
+      <div class="themeTitle">{{ page.questions[0].theme }}</div>
+
+      <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
+
+        <PillButtons @responseInput="postResponse($event)" v-if="questions.type=='LISTE'" :question="questions" />
+
+        <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI'" :question="questions" />
+
+        <Datepicker :idQuestion="questions.id" v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" v-model="dateInput" @change="upDate" :language="fr" />
+
+        <input :idQuestion="questions.id" type="Number" v-if="questions.type=='NUM'" />
+
+        <VueSignature :idQuestion="questions.id" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%" />
+
+        <textarea :idQuestion="questions.id" v-if="questions.type=='MEMO'" />
 
       </QuestionHolder>
 
     </PageHolder>
-  
+
   </div>
 
 </template>
@@ -48,7 +45,7 @@ import { fr } from "vuejs-datepicker/dist/locale";
 import VueSignature from "vue-signature-pad";
 
 export default {
-  remoteUse : true,
+  remoteUse: false,
   name: "App",
   components: {
     PageButtons,
@@ -61,25 +58,47 @@ export default {
   },
   data() {
     return {
-      dateInput:null,
+      dateInput: null,
       extObj: {},
       rootPage: 1,
       fr: fr
     };
   },
   methods: {
+    postResponse(response) {
+      console.log("test");
+      console.log(response);
+      this.$http
+        .post(
+          "http://" +
+            (this.remoteUse ? "localhost" : "pno-pc.levallois.eudoweb.com") +
+            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/" +
+            "services/answer?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d",
+          JSON.stringify(response)
+        )
+        .then(httpresp => {
+          //console.log(httpresp)
+          alert("succes");
+        })
+        .catch(error => {
+          alert("en erreur");
+        });
+        //response.id = questionId,
+        //console.log(response)
+    },
     page(currentPage) {
       this.rootPage = currentPage.number;
     },
     update() {
-      console.log('youpi')
+      console.log("youpi");
     }
   },
   mounted() {
-    
     this.$http
       .get(
-        "http://"+ (this.remoteUse ? 'localhost':'pno-pc.levallois.eudoweb.com') +"/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
+        "http://" +
+          (this.remoteUse ? "localhost" : "pno-pc.levallois.eudoweb.com") +
+          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
       )
       .then(response => {
         this.extObj = response.data;
@@ -140,28 +159,28 @@ h2 {
   width: 300px;
 }
 .questionsHolder {
-  margin:2em 0;
+  margin: 2em 0;
 }
 
 .questionsHolder > input[type="Number"] {
   font-size: 1.8em;
   width: 2.5em;
   padding: 0.2em 0.2em;
-
 }
 div.questionsHolder > div#signature {
   margin: 0 auto;
 }
 div.questionsHolder > textarea {
-      text-align: left;
-    width: 100%;
-    height: 3em;
-    font-size: 1.5em;
-  
+  text-align: left;
+  width: 100%;
+  height: 3em;
+  font-size: 1.5em;
 }
 .questionsHolder > input,
 .datePickr > div > input,
-.questionsHolder > div#signature, textarea, textarea:focus {
+.questionsHolder > div#signature,
+textarea,
+textarea:focus {
   border: none;
   border-bottom: 1px solid #bb1515;
   background-color: #efefef;
@@ -171,5 +190,4 @@ div.questionsHolder > textarea {
   font-weight: bold;
   color: #636363;
 }
-
 </style>

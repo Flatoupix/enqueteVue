@@ -1,6 +1,9 @@
 <template>
   <div class="chkBxHolder">
-    <div @click="select(response)" :key="response.id" v-for="response in selections" class="chkBxGrp">
+    <div @click="select(response)" 
+        :key="response.id" 
+        v-for="response in selections" 
+        class="chkBxGrp">
       <div :class="['resetPosition', (response.selected ? 'checked' : '')]">
         <div class="customTick">L</div>
       </div>
@@ -14,8 +17,8 @@
 <script>
 export default {
   props: {
-    responsesChoices: {
-      type: Array,
+    question: {
+      type: Object,
       default: () => []
     }
   },
@@ -23,19 +26,31 @@ export default {
     let result = {
       selections: []
     };
-    this.responsesChoices.forEach(response => {
-       result.selections.push({
-       id: response.id,
-       value: response.value,
-       selected: false
-     })
-    })
-    return result 
+    this.question.response.forEach(response => {
+      result.selections.push({
+        id: response.id,
+        value: response.value,
+        selected: false
+      });
+    });
+    return result;
   },
   methods: {
     select(response) {
-    response.selected = !response.selected;
-    this.$emit('responseInput', this.selections) 
+      response.selected = !response.selected;
+
+      let ids = [];
+      console.log(this.selections);
+      for (var i = 0; i < this.selections.length; i++) {
+        if (this.selections[i].selected) {
+          ids.push(this.selections[i].id);
+        }
+      }
+      
+      this.$emit("responseInput", {
+        idQuestion: this.question.id,
+        value: ids
+      });
     }
   }
 };
@@ -65,7 +80,7 @@ div.chkBxHolder > div > label {
   font-size: 1.2em;
   vertical-align: 0.3em;
   margin-left: 0.5em;
-      user-select: none;
+  user-select: none;
 }
 div.chkBxGrp {
   position: relative;
@@ -82,21 +97,21 @@ div.chkBxGrp > div.resetPosition div.customTick {
   top: -6px;
 }
 div.resetPosition {
-     overflow: hidden;
-    display: block;
-    opacity: 0;
-    height: 1.8em;
-    line-height: 1.8em;
-    position: absolute;
-    left: 1em;
-    -webkit-transition: all 0.3s;
-    transition: all 300ms 0ms;
-    width: 100%;
+  overflow: hidden;
+  display: block;
+  opacity: 0;
+  height: 1.8em;
+  line-height: 1.8em;
+  position: absolute;
+  left: 1em;
+  -webkit-transition: all 0.3s;
+  transition: all 300ms 0ms;
+  width: 100%;
 }
 .checked.resetPosition {
-      -webkit-transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-    left: 0.2em;
-    opacity: 1;
+  -webkit-transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  left: 0.2em;
+  opacity: 1;
 }
 </style>
