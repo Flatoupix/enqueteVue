@@ -45,7 +45,7 @@ import { fr } from "vuejs-datepicker/dist/locale";
 import VueSignature from "vue-signature-pad";
 
 export default {
-  remoteUse: false,
+  remoteUse: true,
   name: "App",
   components: {
     PageButtons,
@@ -66,7 +66,6 @@ export default {
   },
   methods: {
     postResponse(response) {
-      console.log("test");
       console.log(response);
       this.$http
         .post(

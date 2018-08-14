@@ -4,7 +4,7 @@
     <button type="button" 
             v-for="response in question.response" 
             :key="response.id" 
-            :class="['pillBtn', (currentChoice === response ? 'active' : '')]" 
+            :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" 
             :id="response.id" 
             @click="select(response)">
       {{ response.value }}</button>
@@ -31,8 +31,8 @@ export default {
   },
   methods: {
     select(response) {
-      console.log("fufufu");
-      //this.currentChoice = response.id;
+
+      this.currentChoice = response.id;
       this.$emit("responseInput", {
         idQuestion: this.question.id,
         value: response.id
