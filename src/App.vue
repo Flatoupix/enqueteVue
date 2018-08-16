@@ -18,13 +18,15 @@
 
         <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI'" :question="questions" />
 
-        <Datepicker :idQuestion="questions.id" v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" v-model="dateInput" @change="upDate" :language="fr" />
+        <Datepicker :idQuestion="questions.id" v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" @input="postResponse($event)" :language="fr" />
 
-        <input :idQuestion="questions.id" type="Number" v-if="questions.type=='NUM'" />
+        <input @input="postResponse(inputNum)" v-model="inputNum" :idQuestion="questions.id" type="Number" v-if="questions.type=='NUM'" />
 
-        <VueSignature :idQuestion="questions.id" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%" />
+        <VueSignature :idQuestion="questions.id" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
+          <button @click="save()">Save</button>
+        </VueSignature>
 
-        <textarea :idQuestion="questions.id" v-if="questions.type=='MEMO'" />
+        <textarea @input="postResponse(inputText)" v-model="inputText" :idQuestion="questions.id" v-if="questions.type=='MEMO'" />
 
       </QuestionHolder>
 
@@ -58,9 +60,14 @@ export default {
   },
   data() {
     return {
+      inputText:null,
+      inputNum: null,
       dateInput: null,
+
       extObj: {},
+
       rootPage: 1,
+      
       fr: fr
     };
   },
@@ -77,19 +84,16 @@ export default {
         )
         .then(httpresp => {
           //console.log(httpresp)
-          alert("succes");
+          console.log("succes");
         })
         .catch(error => {
-          alert("en erreur");
+          console.log("en erreur");
         });
         //response.id = questionId,
         //console.log(response)
     },
     page(currentPage) {
       this.rootPage = currentPage.number;
-    },
-    update() {
-      console.log("youpi");
     }
   },
   mounted() {
