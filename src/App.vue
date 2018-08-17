@@ -18,15 +18,15 @@
 
         <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI'" :question="questions" />
 
-        <Datepicker :idQuestion="questions.id" v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" @input="postResponse($event)" :language="fr" />
+        <Datepicker v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" @input="postResponse($event)" :language="fr" />
 
-        <input @input="postResponse(inputNum)" v-model="inputNum" :idQuestion="questions.id" type="Number" v-if="questions.type=='NUM'" />
+        <input @input="postResponse(inputNum,questions.id)" v-model="inputNum" type="Number" v-if="questions.type=='NUM'" />
 
-        <VueSignature :idQuestion="questions.id" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
+        <VueSignature v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
           <button @click="save()">Save</button>
         </VueSignature>
 
-        <textarea @input="postResponse(inputText)" v-model="inputText" :idQuestion="questions.id" v-if="questions.type=='MEMO'" />
+        <textarea @input="postResponse(inputText, questions.id)" v-model="inputText" v-if="questions.type=='MEMO'" />
 
       </QuestionHolder>
 
@@ -60,37 +60,55 @@ export default {
   },
   data() {
     return {
-      inputText:null,
+      inputText: null,
       inputNum: null,
       dateInput: null,
 
       extObj: {},
 
       rootPage: 1,
-      
+
       fr: fr
     };
   },
   methods: {
-    postResponse(response) {
-      console.log(response);
+    postResponse(response, id, type) {
+      let objFormat = {};
+
+      if (typeof response !== "object") {
+        // let typeChange = null;
+        // if (type === "NUM") {
+        //   if (typeof response === "string") {
+        //     typeChange = parseInt(response, 10);
+        //   } else {
+        //     typeChange = response;
+        //   }
+        // }
+
+        this.objFormat = {
+          idQuestion: id,
+          value: response
+        };
+      } else {
+        this.objFormat = response;
+      }
+
+      console.log(this.objFormat);
+
       this.$http
         .post(
           "http://" +
             (this.remoteUse ? "localhost" : "pno-pc.levallois.eudoweb.com") +
-            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/" +
-            "services/answer?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d",
-          JSON.stringify(response)
+            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/" +
+            "answer?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d",
+          JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
-          //console.log(httpresp)
           console.log("succes");
         })
         .catch(error => {
           console.log("en erreur");
         });
-        //response.id = questionId,
-        //console.log(response)
     },
     page(currentPage) {
       this.rootPage = currentPage.number;

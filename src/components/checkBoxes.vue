@@ -40,12 +40,12 @@ export default {
       response.selected = !response.selected;
 
       let ids = [];
-      console.log(this.selections);
-      for (var i = 0; i < this.selections.length; i++) {
-        if (this.selections[i].selected) {
-          ids.push(this.selections[i].id);
+
+      this.selections.forEach(element => {
+        if(element.selected) {
+          ids.push(element.id)
         }
-      }
+      })
       
       this.$emit("responseInput", {
         idQuestion: this.question.id,

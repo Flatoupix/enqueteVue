@@ -19,10 +19,6 @@ export default {
       type: Object,
       default: () => {}
     }
-    /*responsesChoices: {
-      type: Array,
-      default: () => []
-    }*/
   },
   data() {
     return {
