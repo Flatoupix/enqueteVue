@@ -1,24 +1,27 @@
 <template>
   <div id="app">
 
-    <PageButtons :page="extObj.pages" @pageSelected="page" />
+    <PageButtons :page="extObj.pages" :rootPage="rootPage" @pageSelected="page" />
     <!-- <image/> -->
-    <div class="bannerImg">{{extObj.image}}</div>
+    <div class="bannerImg">
+      <image :src="extObj.pic" />
+    </div>
     <h1>{{extObj.title}}</h1>
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
 
-    <PageHolder v-if="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+    <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
 
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
       <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
 
-        <PillButtons @responseInput="postResponse($event)" v-if="questions.type=='LISTE'" :question="questions" />
+        <PillButtons @responseInput="postResponse($event)"
+        v-if="questions.type=='LISTE'" :question="questions" />
 
         <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI'" :question="questions" />
 
-        <Datepicker v-if="questions.type=='DATE'||questions.type=='BIRTHDAY'" class="datePickr" @input="postResponse($event)" :language="fr" />
+        <DatePicker @responseInput="postResponse($event)" :inptType="questions.type" :question="questions" />
 
         <input @input="postResponse(inputNum,questions.id)" v-model="inputNum" type="Number" v-if="questions.type=='NUM'" />
 
@@ -42,19 +45,17 @@ import PageHolder from "./components/pageHolder.vue";
 import PillButtons from "./components/pillButtons.vue";
 import QuestionHolder from "./components/questionHolder.vue";
 import CheckBoxes from "./components/checkBoxes.vue";
-import Datepicker from "vuejs-datepicker";
-import { fr } from "vuejs-datepicker/dist/locale";
+import DatePicker from "./components/datePicker.vue";
 import VueSignature from "vue-signature-pad";
 
 export default {
-  remoteUse: true,
   name: "App",
   components: {
     PageButtons,
     PageHolder,
     PillButtons,
     CheckBoxes,
-    Datepicker,
+    DatePicker,
     VueSignature,
     QuestionHolder
   },
@@ -63,28 +64,27 @@ export default {
       inputText: null,
       inputNum: null,
       dateInput: null,
-
+      remoteUse: {
+        local: "localhost",
+        nla: "nla2-pc",
+        pno: "pno-pc"
+      },
       extObj: {},
-
-      rootPage: 1,
-
-      fr: fr
+      urlHeader: {},
+      tokenName: null,
+      tokenValue: null,
+      // jsonKey: {
+      //   ano:
+      //     "ano=xErR2%2BcLW5hpdgwad68nmeOYZxxApVN%2Fd4r%2FNmAcbH7uUvWRzRCN%2Bslc1N8ZKC9UtjeMvI6%2F7Pz88lv3CJyOC3MzEGodznO9h1BJvbESa84%3D",
+      //   com: "com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
+      // },
+      rootPage: 1
     };
   },
   methods: {
-    postResponse(response, id, type) {
+    postResponse(response, id) {
       let objFormat = {};
-
       if (typeof response !== "object") {
-        // let typeChange = null;
-        // if (type === "NUM") {
-        //   if (typeof response === "string") {
-        //     typeChange = parseInt(response, 10);
-        //   } else {
-        //     typeChange = response;
-        //   }
-        // }
-
         this.objFormat = {
           idQuestion: id,
           value: response
@@ -92,22 +92,25 @@ export default {
       } else {
         this.objFormat = response;
       }
-
       console.log(this.objFormat);
-
       this.$http
         .post(
           "http://" +
-            (this.remoteUse ? "localhost" : "pno-pc.levallois.eudoweb.com") +
+            this.remoteUse.nla +
             "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/" +
-            "answer?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d",
+            "answer?" +
+            this.tokenName +
+            "=" +
+            encodeURIComponent(this.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
           console.log("succes");
+  
         })
         .catch(error => {
           console.log("en erreur");
+         
         });
     },
     page(currentPage) {
@@ -115,14 +118,37 @@ export default {
     }
   },
   mounted() {
+    if (this.$route.query.auth) {
+      console.log("auth");
+      // l'utilisateur est authentifié : le token ne change pas
+      this.tokenName = "auth";
+      this.tokenValue = this.$route.query.auth;
+    } else if (this.$route.query.ano) {
+      this.tokenName = "ano";
+      this.tokenValue = this.$route.query.ano;
+    } else {
+      console.log("com");
+      // l'utilisateur est anonyme : le token change au premier appel
+      this.tokenName = "com";
+      this.tokenValue = this.$route.query.com;
+    }
+
+    console.log(this.$route.query);
+
     this.$http
       .get(
         "http://" +
-          (this.remoteUse ? "localhost" : "pno-pc.levallois.eudoweb.com") +
-          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
+          this.remoteUse.nla +
+          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+          this.tokenName +
+          "=" +
+          encodeURIComponent(this.tokenValue)
       )
       .then(response => {
         this.extObj = response.data;
+        this.tokenName = response.data.NameKey;
+        this.tokenValue = response.data.ValueKey;
+    
       })
       .catch(error => {
         console.log(error);
@@ -173,12 +199,6 @@ h2 {
   margin: 1.4em auto;
 }
 
-.datePickr {
-  margin: 0 auto;
-  display: block;
-  text-align: center;
-  width: 300px;
-}
 .questionsHolder {
   margin: 2em 0;
 }

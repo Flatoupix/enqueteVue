@@ -11,11 +11,15 @@ export default {
     page: {
       type: Array,
       default: () => [{}]
+    },
+    rootPage: {
+      type:Number,
+      default:() => 0
     }
   },
   data() {
     return {
-      currentPage: 1
+      currentPage:this.rootPage
     };
   },
   methods: {
