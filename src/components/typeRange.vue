@@ -1,5 +1,5 @@
 <template>
-    <input type="range" :max="question.x" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
+    <input type="range" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
 
 </template>
 

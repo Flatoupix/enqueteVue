@@ -4,7 +4,11 @@
         :key="response.id" 
         v-for="response in selections" 
         class="chkBxGrp">
-      <div :class="['resetPosition', (response.selected ? 'checked' : '')]">
+      <div v-if="question.type=='MULTI'" :class="['resetPosition',
+      (response.selected ? 'checked' : '')]">
+          <div class="customTick">L</div>
+      </div>
+      <div v-if="question.type=='CHECKBOX'" :class="['resetPosition', (currentTarget ? 'checked' : '')]">
         <div class="customTick">L</div>
       </div>
       <div :id="response.id" class="chkElmnt" />
@@ -33,7 +37,8 @@ export default {
         selected: false
       });
     });
-    return result;
+    return result,
+    currentTarget=null
   },
   methods: {
     select(response) {
