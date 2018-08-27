@@ -19,6 +19,9 @@
         <PillButtons @responseInput="postResponse($event)"
         v-if="questions.type=='LISTE'" :question="questions" />
 
+        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions" ></VueStars>
+
+        <Range  type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions"/>
         <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI'" :question="questions" />
 
         <DatePicker @responseInput="postResponse($event)" :inptType="questions.type" :question="questions" />
@@ -47,6 +50,9 @@ import QuestionHolder from "./components/questionHolder.vue";
 import CheckBoxes from "./components/checkBoxes.vue";
 import DatePicker from "./components/datePicker.vue";
 import VueSignature from "vue-signature-pad";
+import VueStars from "./components/Stars.vue";
+import Range from "./components/typeRange.vue";
+
 
 export default {
   name: "App",
@@ -57,26 +63,29 @@ export default {
     CheckBoxes,
     DatePicker,
     VueSignature,
-    QuestionHolder
+    QuestionHolder,
+    VueStars,
+    Range
   },
   data() {
     return {
       inputText: null,
       inputNum: null,
       dateInput: null,
-      remoteUse: {
-        local: "localhost",
-        nla: "nla2-pc",
-        pno: "pno-pc"
-      },
+      remoteUse: 
+        // "localhost"
+        "nla2-pc.levallois.eudoweb.com"
+        // "pno-pc.levallois.eudoweb.com"
+      ,
       extObj: {},
       urlHeader: {},
+
       tokenName: null,
       tokenValue: null,
       // jsonKey: {
       //   ano:
       //     "ano=xErR2%2BcLW5hpdgwad68nmeOYZxxApVN%2Fd4r%2FNmAcbH7uUvWRzRCN%2Bslc1N8ZKC9UtjeMvI6%2F7Pz88lv3CJyOC3MzEGodznO9h1BJvbESa84%3D",
-      //   com: "com=Xela17fFtoxfis%2fafICQlXqRyeNKt1AsKDIOaYXZuzg%3d"
+      //   com: "com=Xela17fFtozsh5eQ34Dto5sNO%2BBWOO%2Fs7zXcjV%2FhU38%3D"
       // },
       rootPage: 1
     };
@@ -96,7 +105,7 @@ export default {
       this.$http
         .post(
           "http://" +
-            this.remoteUse.nla +
+            this.remoteUse +
             "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/" +
             "answer?" +
             this.tokenName +
@@ -138,12 +147,17 @@ export default {
     this.$http
       .get(
         "http://" +
-          this.remoteUse.nla +
+          this.remoteUse +
           "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
           this.tokenName +
           "=" +
           encodeURIComponent(this.tokenValue)
-      )
+      ).then(console.log( "http://" +
+          this.remoteUse +
+          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+          this.tokenName +
+          "=" +
+          encodeURIComponent(this.tokenValue)))
       .then(response => {
         this.extObj = response.data;
         this.tokenName = response.data.NameKey;
@@ -230,5 +244,22 @@ textarea:focus {
   padding: 0.2em;
   font-weight: bold;
   color: #636363;
+}
+
+.questionHolder > input[type="range"]::-webkit-slider-runnable-track {
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    -webkit-appearance: none;
+}
+
+.questionHolder > input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    background-color: #f89406;
+    transform: rotate(45deg);
+    box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.1);
+    -webkit-appearance: none;
 }
 </style>
