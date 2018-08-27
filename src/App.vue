@@ -16,23 +16,31 @@
 
       <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
 
-        <PillButtons @responseInput="postResponse($event)" v-if="questions.type=='LISTE'" :question="questions" />
+        <PillButtons @responseInput="postResponse($event)"
+        v-if="questions.type=='LISTE'" :question="questions" />
 
-        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
+        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions" ></VueStars>
 
-        <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions" />
-        <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='CHECKBOX' && questions.type=='MULTI'" :question="questions" :id="questions.id" />
+        <Range  type="range" @responseInput="postResponse($event)"
+        v-if="questions.type=='RANGE'" :question="questions"/>
+        
+        <CheckBoxes @responseInput="postResponse($event)"
+        v-if="(questions.type=='CHECKBOX' &&  questions.type=='MULTI')"
+        :question="questions" />
+        
 
-        <DatePicker @responseInput="postResponse($event)" :inptType="questions.type" :question="questions" />
+        <DatePicker @responseInput="postResponse($event)" :inptType="questions.type" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"/>
 
-        <input @input="postResponse(inputNum,questions.id)" v-model="inputNum" type="Number" v-if="questions.type=='NUM'" />
-        <input @input="postResponse(inputText,questions.id)" v-model="inputText" type="text" v-if="questions.type=='TEXT'" />
+        <typeInput @responseInput="postResponse($event)"
+        v-if="questions.type=='NUM' || questions.type=='TEXT' ||
+        questions.type=='MEMO'" v-model="input" :question="questions"/>
+     
 
         <VueSignature v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
           <button @click="save()">Save</button>
         </VueSignature>
 
-        <textarea @input="postResponse(inputText, questions.id)" v-model="inputText" v-if="questions.type=='MEMO'" />
+        
 
       </QuestionHolder>
 
@@ -52,6 +60,8 @@ import DatePicker from "./components/datePicker.vue";
 import VueSignature from "vue-signature-pad";
 import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
+import typeInput from "./components/typeInput.vue"
+
 
 export default {
   name: "App",
@@ -64,27 +74,24 @@ export default {
     VueSignature,
     QuestionHolder,
     VueStars,
-    Range
+    Range,
+    typeInput
   },
   data() {
     return {
-      inputText: null,
-      inputNum: null,
+      input: null,
+
       dateInput: null,
-      remoteUse:
+      remoteUse: 
         // "localhost"
-        "nla2-pc.levallois.eudoweb.com",
-      // "pno-pc.levallois.eudoweb.com"
+        "nla2-pc.levallois.eudoweb.com"
+        // "pno-pc.levallois.eudoweb.com"
+      ,
       extObj: {},
       urlHeader: {},
 
       tokenName: null,
       tokenValue: null,
-      // jsonKey: {
-      //   ano:
-      //     "ano=xErR2%2BcLW5hpdgwad68nmeOYZxxApVN%2Fd4r%2FNmAcbH7uUvWRzRCN%2Bslc1N8ZKC9UtjeMvI6%2F7Pz88lv3CJyOC3MzEGodznO9h1BJvbESa84%3D",
-      //   com: "com=Xela17fFtozsh5eQ34Dto5sNO%2BBWOO%2Fs7zXcjV%2FhU38%3D"
-      // },
       rootPage: 1
     };
   },
@@ -113,9 +120,11 @@ export default {
         )
         .then(httpresp => {
           console.log("succes");
+  
         })
         .catch(error => {
           console.log("en erreur");
+         
         });
     },
     page(currentPage) {
@@ -148,21 +157,17 @@ export default {
           this.tokenName +
           "=" +
           encodeURIComponent(this.tokenValue)
-      )
-      .then(
-        console.log(
-          "http://" +
-            this.remoteUse +
-            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
-            this.tokenName +
-            "=" +
-            encodeURIComponent(this.tokenValue)
-        )
-      )
+      ).then(console.log( "http://" +
+          this.remoteUse +
+          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+          this.tokenName +
+          "=" +
+          encodeURIComponent(this.tokenValue)))
       .then(response => {
         this.extObj = response.data;
         this.tokenName = response.data.NameKey;
         this.tokenValue = response.data.ValueKey;
+    
       })
       .catch(error => {
         console.log(error);
@@ -216,50 +221,24 @@ h2 {
 .questionsHolder {
   margin: 2em 0;
 }
-
-.questionsHolder > input[type="Number"] {
-  font-size: 1.8em;
-  width: 2.5em;
-  padding: 0.2em 0.2em;
-}
 div.questionsHolder > div#signature {
   margin: 0 auto;
 }
-div.questionsHolder > textarea {
-  text-align: left;
-  width: 100%;
-  height: 3em;
-  font-size: 1.5em;
-}
-.questionsHolder > input,
-.datePickr > div > input,
-.questionsHolder > div#signature,
-textarea,
-textarea:focus {
-  border: none;
-  border-bottom: 1px solid #bb1515;
-  background-color: #efefef;
-  text-align: center;
-  font-size: 1.4em;
-  padding: 0.2em;
-  font-weight: bold;
-  color: #636363;
-}
 
 .questionHolder > input[type="range"]::-webkit-slider-runnable-track {
-  box-shadow: none;
-  border: none;
-  background: transparent;
-  -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    -webkit-appearance: none;
 }
 
 .questionHolder > input[type="range"]::-webkit-slider-thumb {
-  width: 20px;
-  height: 20px;
-  border: 0;
-  background-color: #f89406;
-  transform: rotate(45deg);
-  box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.1);
-  -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 0;
+    background-color: #f89406;
+    transform: rotate(45deg);
+    box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.1);
+    -webkit-appearance: none;
 }
 </style>

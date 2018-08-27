@@ -6,8 +6,7 @@
         class="chkBxGrp">
       <div v-if="question.type=='MULTI'" :class="['resetPosition',
       (response.selected ? 'checked' : '')]">
-          <div class="customTick">L</div>
-      </div>
+        </div>
       <div v-if="question.type=='CHECKBOX'" :class="['resetPosition', (currentTarget ? 'checked' : '')]">
         <div class="customTick">L</div>
       </div>
