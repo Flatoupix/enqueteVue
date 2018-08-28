@@ -23,9 +23,11 @@ export default {
     };
   },
   methods: {
-    select(reponse) {
-      this.currentPage = reponse.number;
-      this.$emit("pageSelected", reponse);
+    select(response) {
+      this.currentPage = response.number
+      this.$route.params.rootPage  = response.number 
+      this.$emit("pageSelected", response);
+
     }
   }
 };

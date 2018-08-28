@@ -1,7 +1,8 @@
 <template>
   <div id="app">
 
-    <PageButtons :page="extObj.pages" :rootPage="rootPage" @pageSelected="page" />
+    <PageButtons :page="extObj.pages"
+    :rootPage="parseInt($route.params.rootPage)" @pageSelected="page" />
     <!-- <image/> -->
     <div class="bannerImg">
       <image :src="extObj.pic" />
@@ -89,7 +90,6 @@ export default {
       ,
       extObj: {},
       urlHeader: {},
-
       tokenName: null,
       tokenValue: null,
       rootPage: 1
@@ -129,9 +129,12 @@ export default {
     },
     page(currentPage) {
       this.rootPage = currentPage.number;
+      
     }
   },
   mounted() {
+    this.rootPage = this.$route.params.rootPage
+
     if (this.$route.query.auth) {
       console.log("auth");
       // l'utilisateur est authentifié : le token ne change pas

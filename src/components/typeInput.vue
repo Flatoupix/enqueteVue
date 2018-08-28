@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input v-if="question.type=='TEXT'" type="text" @input="select(input,question.id)" v-model="input" />
+    <input v-if="question.type=='TEXT'" class="textField" type="text" @input="select(input,question.id)" v-model="input" />
     <input v-if="question.type=='NUM'" type="number" @input="select(input,question.id)" v-model="input" />
     <textarea v-if="question.type=='MEMO'" @input="select(input,question.id)" v-model="input" />
   </div>
@@ -43,8 +43,13 @@ textarea {
   font-weight: bold;
   color: #636363;
 }
+.textField { 
+  width: 40em;
+  text-align: left;
+  text-indent: 0.5em;
+}
 input[type="Number"] {
-  font-size: 1.8em;
+  font-size: 1.5em;
   width: 2.5em;
   padding: 0.2em 0.2em;
 }

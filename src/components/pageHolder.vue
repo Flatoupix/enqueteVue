@@ -18,10 +18,8 @@ export default {
   methods: {
     select(reponse) {
       this.currentChoice = reponse
-      // this.$emit('response', target)
     }
-  },
-  computed: {}
+  }
 };
 </script>
 

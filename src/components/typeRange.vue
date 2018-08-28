@@ -1,6 +1,7 @@
 <template>
-    <input type="range" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
-
+  <div class="rangeContainer">
+    <input class="customRange" type="range" step="10" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
+  </div>
 </template>
 
 <script>
@@ -29,41 +30,44 @@ export default {
 </script>
 
 <style>
-
-.questionHolder > input[type="range"]::-webkit-slider-runnable-track {
+div.rangeContainer {
+      margin: 0 20px;
+    vertical-align: 40px;
+    position: relative;
+}
+input.customRange[type="range"] {
+-webkit-appearance: inherit;
+    border: none;
+    height: 0em;
+    width: 20em;
+    cursor: pointer;
+}
+input.customRange[type="range"]::-webkit-slider-runnable-track {
     box-shadow: none;
     border: none;
     background: transparent;
     -webkit-appearance: none;
 }
 
-.questionHolder > input[type="range"]::-moz-range-track {
+input.customRange[type="range"]::-moz-range-track {
     box-shadow: none;
     border: none;
     background: transparent;
 }
 
-.questionHolder > input[type="range"]::-moz-focus-outer {
+input.customRange[type="range"]::-moz-focus-outer {
     border: 0;
 }
 
-.questionHolder > input[type="range"]::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
+input.customRange[type="range"]::-webkit-slider-thumb {
+    width: 1.5em;
+    height: 1.5em;
     border: 0;
-    background-color: #f89406;
-    transform: rotate(45deg);
-    box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.1);
-    -webkit-appearance: none;
-}
-
-.questionHolder > input[type="range"]::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border: 0;
-    background: #fff;
     border-radius: 100%;
+    background-color: #bb1515;
     box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.1);
+    -webkit-appearance: none;
 }
+
 </style>
 
