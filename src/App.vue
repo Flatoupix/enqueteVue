@@ -25,9 +25,7 @@
         <Range  type="range" @responseInput="postResponse($event)"
         v-if="questions.type=='RANGE'" :question="questions"/>
         
-        <CheckBoxes @responseInput="postResponse($event)"
-        v-if="(questions.type=='CHECKBOX' &&  questions.type=='MULTI')"
-        :question="questions" />
+        <CheckBoxes  v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " @responseInput="postResponse($event)" :question="questions" />
         
 
         <DatePicker @responseInput="postResponse($event)" :inptType="questions.type" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"/>

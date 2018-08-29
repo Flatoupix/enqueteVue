@@ -13,21 +13,21 @@ export default {
       default: () => [{}]
     },
     rootPage: {
-      type:Number,
-      default:() => 0
+      type: Number,
+      default: () => 0
     }
   },
   data() {
     return {
-      currentPage:this.rootPage
+      currentPage: this.rootPage
     };
   },
   methods: {
     select(response) {
-      this.currentPage = response.number
-      this.$route.params.rootPage  = response.number 
+      this.currentPage = response.number;
+      this.$route.params.rootPage = response.number;
+      
       this.$emit("pageSelected", response);
-
     }
   }
 };

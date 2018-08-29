@@ -1,13 +1,16 @@
 <template>
   <div class="chkBxHolder">
-    <div @click="select(response)" 
-        :key="response.id" 
-        v-for="response in selections" 
-        class="chkBxGrp">
-      <div v-if="question.type=='MULTI'" :class="['resetPosition',
+    <div v-if="question.type=='MULTI'" @click="select(response)" :key="response.id" v-for="response in selections" class="chkBxGrp">
+      <div :class="['resetPosition',
       (response.selected ? 'checked' : '')]">
-        </div>
-      <div v-if="question.type=='CHECKBOX'" :class="['resetPosition', (currentTarget ? 'checked' : '')]">
+        <div class="customTick">L</div>
+      </div>
+      <div :id="response.id" class="chkElmnt" />
+      <label :for="response.id">{{ response.value }}</label>
+    </div>
+    <div v-if="question.type=='SIMPLE'" @click="select(response)" :key="response.id" v-for="response in question.response" class="chkBxGrp">
+      <div :class="['resetPosition',
+      (currentTarget==response.id ? 'checked' : '')]">
         <div class="customTick">L</div>
       </div>
       <div :id="response.id" class="chkElmnt" />
@@ -26,34 +29,42 @@ export default {
     }
   },
   data() {
+
     let result = {
-      selections: []
+      selections: [],
+      currentTarget: ""
     };
-    this.question.response.forEach(response => {
-      result.selections.push({
-        id: response.id,
-        value: response.value,
-        selected: false
-      });
-    });
-    return result,
-    currentTarget=null
+    if (this.question.type == "MULTI") {
+      this.question.response.forEach(response => {
+        result.selections.push({
+          id: response.id,
+          value: response.value,
+          selected: false
+        })
+      })
+    } 
+    return result;
   },
   methods: {
     select(response) {
-      response.selected = !response.selected;
+     
 
-      let ids = [];
-
-      this.selections.forEach(element => {
-        if(element.selected) {
-          ids.push(element.id)
-        }
-      })
-      
+      if (this.question.type == "MULTI") {
+         response.selected = !response.selected;
+        this.ids = [];
+        this.selections.forEach(element => {
+          if (element.selected) {
+            this.ids.push(element.id);
+          }
+        });
+      } else {
+           this.currentTarget = response.id
+           this.ids = []
+           this.ids.push(response.id)
+      }
       this.$emit("responseInput", {
         idQuestion: this.question.id,
-        value: ids
+        value: this.ids
       });
     }
   }

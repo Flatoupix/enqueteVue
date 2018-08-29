@@ -13,7 +13,8 @@ export default new Router({
       component: App
     },
     {
-      path: '/:rootPage'
+      path: '/:rootPage',
+      name: this.rootPage
     }
   ]
 })
