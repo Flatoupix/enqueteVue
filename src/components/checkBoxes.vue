@@ -8,7 +8,7 @@
       <div :id="response.id" class="chkElmnt" />
       <label :for="response.id">{{ response.value }}</label>
     </div>
-    <div v-if="question.type=='SIMPLE'" @click="select(response)" :key="response.id" v-for="response in question.response" class="chkBxGrp">
+    <div v-if="question.type=='SIMPLE'" @click="select(response)" :key="response.id" v-for="response in question.responseChoices" class="chkBxGrp">
       <div :class="['resetPosition',
       (currentTarget==response.id ? 'checked' : '')]">
         <div class="customTick">L</div>
@@ -29,28 +29,37 @@ export default {
     }
   },
   data() {
-
     let result = {
       selections: [],
       currentTarget: ""
     };
+
+    this.question.responseChoices.forEach(response => {
+      result.selections.push({
+        id: response.id,
+        value: response.value,
+        selected: false
+      });
+    });
     if (this.question.type == "MULTI") {
-      this.question.response.forEach(response => {
-        result.selections.push({
-          id: response.id,
-          value: response.value,
-          selected: false
-        })
-      })
-    } 
+      if (this.question.reponse != "") {
+        result.selections.forEach(selection => {
+          this.question.response.value.forEach(value => {
+            if (selection.id == value) {
+              selection.selected = true;
+            }
+          });
+        });
+      }
+    } else {
+      result.currentTarget = this.question.response.value;
+    }
     return result;
   },
   methods: {
     select(response) {
-     
-
       if (this.question.type == "MULTI") {
-         response.selected = !response.selected;
+        response.selected = !response.selected;
         this.ids = [];
         this.selections.forEach(element => {
           if (element.selected) {
@@ -58,9 +67,9 @@ export default {
           }
         });
       } else {
-           this.currentTarget = response.id
-           this.ids = []
-           this.ids.push(response.id)
+        this.currentTarget = response.id;
+        this.ids = [];
+        this.ids.push(response.id);
       }
       this.$emit("responseInput", {
         idQuestion: this.question.id,

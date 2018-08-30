@@ -5,11 +5,9 @@ import App from '@/App'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
-  routes: [
-    {
+  routes: [{
       path: '/',
-      name: 'App',    
+      name: 'App',
       component: App
     },
     {

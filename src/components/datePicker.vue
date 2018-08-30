@@ -1,7 +1,10 @@
 <template>
   <div>
-    <vueDatePicker v-if="inptType=='BIRTHDAY'" class="datePickr" :language="fr" :format="'dd/MM/yy'" @input="select(dateTime,question.id)" v-model="dateTime" />
-    <vueDatePicker v-if="inptType=='DATE'" class="datePickr" :language="fr" :format="'yy MMMM yyyy'" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <!-- <vueDatePicker v-if="inptType=='BIRTHDAY'" class="datePickr" :language="fr" :format="'dd/MM/yy'" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <vueDatePicker v-if="inptType=='DATE'" class="datePickr" :language="fr" :format="'yy MMMM yyyy'" @input="select(dateTime,question.id)" v-model="dateTime" /> -->
+     <vueDatePicker class="datePickr" :language="fr"
+     @input="select(dateTime,question.id)" v-model="dateTime" />
+  
   </div>
 </template>
 <style>
@@ -20,17 +23,18 @@ export default {
     question: {
       type: Object,
       default: () => {}
-    },
-    inptType: {
-      type: String,
-      default: () => ""
     }
   },
   data() {
+    if (this.question.reponse != "") {
+      this.savedChoice = this.question.response.value;
+    } else {
+      this.savedChoice = null;
+    }
     return {
       fr: fr,
-      dateTime: null
-    }
+      dateTime: this.savedChoice
+    };
   },
   methods: {
     select(response, id) {

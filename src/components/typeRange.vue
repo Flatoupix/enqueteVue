@@ -14,8 +14,13 @@ export default {
     }
   },
   data() {
+    if (this.question.reponse != "") {
+      this.savedChoice = parseInt(this.question.response.value);
+    } else {
+      this.savedChoice = null;
+    }
     return {
-      inputRange: null
+      inputRange: this.savedChoice
     };
   },
   methods: {

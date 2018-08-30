@@ -18,7 +18,7 @@
       <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
 
         <PillButtons @responseInput="postResponse($event)"
-        v-if="questions.type=='LISTE'" :question="questions" />
+        v-if="questions.type=='LISTE' || questions.type=='BOOL'" :question="questions" />
 
         <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions" ></VueStars>
 
@@ -28,7 +28,7 @@
         <CheckBoxes  v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " @responseInput="postResponse($event)" :question="questions" />
         
 
-        <DatePicker @responseInput="postResponse($event)" :inptType="questions.type" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"/>
+        <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"/>
 
         <typeInput @responseInput="postResponse($event)"
         v-if="questions.type=='NUM' || questions.type=='TEXT' ||
@@ -36,7 +36,7 @@
      
 
         <VueSignature v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
-          <button @click="save()">Save</button>
+        
         </VueSignature>
 
         
@@ -59,8 +59,7 @@ import DatePicker from "./components/datePicker.vue";
 import VueSignature from "vue-signature-pad";
 import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
-import typeInput from "./components/typeInput.vue"
-
+import typeInput from "./components/typeInput.vue";
 
 export default {
   name: "App",
@@ -81,12 +80,12 @@ export default {
       input: null,
 
       dateInput: null,
-      remoteUse: 
+      remoteUse:
         // "localhost"
-        "nla2-pc.levallois.eudoweb.com"
-        // "pno-pc.levallois.eudoweb.com"
-      ,
+        "nla2-pc.levallois.eudoweb.com",
+      // "pno-pc.levallois.eudoweb.com"
       extObj: {},
+      prevResponses: {},
       urlHeader: {},
       tokenName: null,
       tokenValue: null,
@@ -118,20 +117,17 @@ export default {
         )
         .then(httpresp => {
           console.log("succes");
-  
         })
         .catch(error => {
           console.log("en erreur");
-         
         });
     },
     page(currentPage) {
       this.rootPage = currentPage.number;
-      
     }
   },
   mounted() {
-    this.rootPage = this.$route.params.rootPage
+    this.rootPage = this.$route.params.rootPage;
 
     if (this.$route.query.auth) {
       console.log("auth");
@@ -158,17 +154,22 @@ export default {
           this.tokenName +
           "=" +
           encodeURIComponent(this.tokenValue)
-      ).then(console.log( "http://" +
-          this.remoteUse +
-          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
-          this.tokenName +
-          "=" +
-          encodeURIComponent(this.tokenValue)))
+      )
+      .then(
+        console.log(
+          "http://" +
+            this.remoteUse +
+            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+            this.tokenName +
+            "=" +
+            encodeURIComponent(this.tokenValue)
+        )
+      )
       .then(response => {
         this.extObj = response.data;
+        this.prevResponses = response.data.responses;
         this.tokenName = response.data.NameKey;
         this.tokenValue = response.data.ValueKey;
-    
       })
       .catch(error => {
         console.log(error);
@@ -224,22 +225,13 @@ h2 {
 }
 div.questionsHolder > div#signature {
   margin: 0 auto;
-}
-
-.questionHolder > input[type="range"]::-webkit-slider-runnable-track {
-    box-shadow: none;
-    border: none;
-    background: transparent;
-    -webkit-appearance: none;
-}
-
-.questionHolder > input[type="range"]::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
-    border: 0;
-    background-color: #f89406;
-    transform: rotate(45deg);
-    box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.1);
-    -webkit-appearance: none;
+  border: none;
+  border-bottom: 1px solid #bb1515;
+  background-color: #efefef;
+  text-align: center;
+  font-size: 1.4em;
+  padding: 0.2em;
+  font-weight: bold;
+  color: #636363;
 }
 </style>

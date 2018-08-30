@@ -2,7 +2,7 @@
 <template>
   <div class="buttonsHolder">
     <button type="button" 
-            v-for="response in question.response" 
+            v-for="response in question.responseChoices" 
             :key="response.id" 
             :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" 
             :id="response.id" 
@@ -21,22 +21,30 @@ export default {
     }
   },
   data() {
+    if (this.question.type == "BOOL") {
+      this.question.responseChoices = [
+        { id: 3010138, value: "Oui" },
+        { id: 3010139, value: "Non" }
+      ];
+    }
+    if (this.question.reponse != "") {
+      this.savedChoice = this.question.response.value;
+    } else {
+      this.savedChoice = null;
+    }
     return {
-      currentChoice: null
+      currentChoice: this.savedChoice
     };
   },
   methods: {
     select(response) {
-
       this.currentChoice = response.id;
       this.$emit("responseInput", {
         idQuestion: this.question.id,
         value: response.id
       });
-      
     }
-  },
-  computed: {}
+  }
 };
 </script>
 

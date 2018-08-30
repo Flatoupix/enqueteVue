@@ -1,6 +1,8 @@
 <template>
   <div>
-    <input v-if="question.type=='TEXT'" class="textField" type="text" @input="select(input,question.id)" v-model="input" />
+
+    <input v-if="question.type=='TEXT'" class="textField" type="text"
+    @input="select(input,question.id)" v-model="input" />
     <input v-if="question.type=='NUM'" type="number" @input="select(input,question.id)" v-model="input" />
     <textarea v-if="question.type=='MEMO'" @input="select(input,question.id)" v-model="input" />
   </div>
@@ -16,8 +18,13 @@ export default {
     }
   },
   data() {
+    if (this.question.reponse != "") {
+      this.savedChoice = this.question.response.value;
+    } else {
+      this.savedChoice = null;
+    }
     return {
-      input: null
+      input: this.savedChoice
     };
   },
   methods: {
@@ -43,7 +50,7 @@ textarea {
   font-weight: bold;
   color: #636363;
 }
-.textField { 
+.textField {
   width: 40em;
   text-align: left;
   text-indent: 0.5em;
@@ -60,4 +67,3 @@ textarea {
   font-size: 1.5em;
 }
 </style>
-

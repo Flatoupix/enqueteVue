@@ -1,5 +1,5 @@
 <template>
-    <Stars :show-rating="false" inactive-color="#efefef" active-color="#bb1515" :max-rating="question.number" @rating-selected="select(starsValue,question.id)" v-model="starsValue" />
+  <Stars :show-rating="false" inactive-color="#efefef" active-color="#bb1515" :max-rating="question.number" @rating-selected="select(starsValue,question.id)" v-model="starsValue" />
 </template>
 
 <script>
@@ -17,9 +17,14 @@ export default {
     }
   },
   data() {
+    if (this.question.reponse != "") {
+      this.savedChoice = parseInt(this.question.response.value);
+    } else {
+      this.savedChoice = null;
+    }
     return {
       rating: null,
-      starsValue:null
+      starsValue: this.savedChoice
     };
   },
   methods: {
@@ -38,4 +43,3 @@ export default {
   margin: 0 auto;
 }
 </style>
-
