@@ -1,8 +1,7 @@
 <template>
   <div id="app">
 
-    <PageButtons :page="extObj.pages"
-    :rootPage="parseInt($route.params.rootPage)" @pageSelected="page" />
+    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @pageSelected="page" />
     <!-- <image/> -->
     <div class="bannerImg">
       <image :src="extObj.pic" />
@@ -17,29 +16,22 @@
 
       <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
 
-        <PillButtons @responseInput="postResponse($event)"
-        v-if="questions.type=='LISTE' || questions.type=='BOOL'" :question="questions" />
+        <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
 
-        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions" ></VueStars>
+        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
 
-        <Range  type="range" @responseInput="postResponse($event)"
-        v-if="questions.type=='RANGE'" :question="questions"/>
-        
-        <CheckBoxes  v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " @responseInput="postResponse($event)" :question="questions" />
-        
+        <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions" />
 
-        <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"/>
+        <CheckBoxes v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " @responseInput="postResponse($event)" :question="questions" />
 
-        <typeInput @responseInput="postResponse($event)"
-        v-if="questions.type=='NUM' || questions.type=='TEXT' ||
-        questions.type=='MEMO'" v-model="input" :question="questions"/>
-     
+        <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
+
+        <typeInput @responseInput="postResponse($event)" v-if="(questions.type=='NUM' || questions.type=='TEXT' ||
+        questions.type=='MEMO') && !question.lnkResponse" v-model="input" :question="questions" />
 
         <VueSignature v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
-        
-        </VueSignature>
 
-        
+        </VueSignature>
 
       </QuestionHolder>
 
