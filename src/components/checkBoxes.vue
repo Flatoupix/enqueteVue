@@ -42,7 +42,7 @@ export default {
       });
     });
     if (this.question.type == "MULTI") {
-      if (this.question.reponse != "") {
+      if (this.question.reponse != (""||null||undefined)) {
         result.selections.forEach(selection => {
           this.question.response.value.forEach(value => {
             if (selection.id == value) {

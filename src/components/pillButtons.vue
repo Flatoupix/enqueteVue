@@ -1,7 +1,7 @@
 
 <template>
   <div class="buttonsHolder">
-    <button type="button" 
+    <button :aria-label="question.toolTip" aria-disabled="false" type="button" 
             v-for="response in question.responseChoices" 
             :key="response.id" 
             :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" 

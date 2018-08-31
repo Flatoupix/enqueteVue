@@ -1,6 +1,6 @@
 <template>
   <div class="rangeContainer">
-    <input class="customRange" type="range" :step="question.step" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
+    <input :aria="question.Tooltoio" class="customRange" type="range" :step="question.step" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
   </div>
 </template>
 

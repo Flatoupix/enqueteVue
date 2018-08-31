@@ -10,7 +10,7 @@
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
 
-    <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+    <PageHolder v-show="rootPage==page.number" v-if="page.questions.lnkResponse != ''" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
 
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
@@ -26,8 +26,8 @@
 
         <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
 
-        <typeInput @responseInput="postResponse($event)" v-if="(questions.type=='NUM' || questions.type=='TEXT' ||
-        questions.type=='MEMO') && !question.lnkResponse" v-model="input" :question="questions" />
+        <typeInput @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
+        questions.type=='MEMO'" v-model="input" :question="questions" />
 
         <VueSignature v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
 
@@ -52,6 +52,7 @@ import VueSignature from "vue-signature-pad";
 import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
+
 
 export default {
   name: "App",
@@ -211,7 +212,17 @@ h2 {
   text-align: left;
   margin: 1.4em auto;
 }
-
+input,
+textarea {
+  border: none;
+  border-bottom: 1px solid #bb1515;
+  background-color: #efefef;
+  text-align: center;
+  font-size: 1.4em;
+  padding: 0.2em;
+  font-weight: bold;
+  color: #636363;
+}
 .questionsHolder {
   margin: 2em 0;
 }

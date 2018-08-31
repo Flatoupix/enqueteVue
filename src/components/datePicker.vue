@@ -2,7 +2,7 @@
   <div>
     <!-- <vueDatePicker v-if="inptType=='BIRTHDAY'" class="datePickr" :language="fr" :format="'dd/MM/yy'" @input="select(dateTime,question.id)" v-model="dateTime" />
     <vueDatePicker v-if="inptType=='DATE'" class="datePickr" :language="fr" :format="'yy MMMM yyyy'" @input="select(dateTime,question.id)" v-model="dateTime" /> -->
-     <vueDatePicker class="datePickr" :language="fr"
+     <vueDatePicker :aria-label="question.Tooltip" class="datePickr" :language="fr"
      @input="select(dateTime,question.id)" v-model="dateTime" />
   
   </div>
