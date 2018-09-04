@@ -1,12 +1,7 @@
 
 <template>
   <div class="buttonsHolder">
-    <button :aria-label="question.toolTip" aria-disabled="false" type="button" 
-            v-for="response in question.responseChoices" 
-            :key="response.id" 
-            :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" 
-            :id="response.id" 
-            @click="select(response)">
+    <button type="button" v-for="response in question.responseChoices" :key="response.id" :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" :id="response.id" @click="select(response)">
       {{ response.value }}</button>
   </div>
 
@@ -21,13 +16,7 @@ export default {
     }
   },
   data() {
-    if (this.question.type == "BOOL") {
-      this.question.responseChoices = [
-        { id: 3010138, value: "Oui" },
-        { id: 3010139, value: "Non" }
-      ];
-    }
-    if (this.question.reponse != "") {
+    if (this.question.response != "") {
       this.savedChoice = this.question.response.value;
     } else {
       this.savedChoice = null;
@@ -39,6 +28,7 @@ export default {
   methods: {
     select(response) {
       this.currentChoice = response.id;
+      
       this.$emit("responseInput", {
         idQuestion: this.question.id,
         value: response.id

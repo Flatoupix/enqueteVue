@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-
     <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @pageSelected="page" />
     <!-- <image/> -->
     <div class="bannerImg">
@@ -10,26 +9,28 @@
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
 
-    <PageHolder v-show="rootPage==page.number" v-if="page.questions.lnkResponse != ''" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+    <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
 
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
-      <QuestionHolder :question="questions" v-for="questions in page.questions" :key="questions.id">
+      <QuestionHolder :question="questions" :ifDisplay="ifDisplay"
+      v-for="questions in page.questions" v-show="!questions.isHiding ||
+      show.includes(questions.id)"
+      :key="questions.id">
 
         <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
-
         <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
 
         <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions" />
 
-        <CheckBoxes v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " @responseInput="postResponse($event)" :question="questions" />
+        <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
 
         <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
 
         <typeInput @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
-        <VueSignature v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
+        <VueSignature @responseInput="postResponse($event)" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
 
         </VueSignature>
 
@@ -53,7 +54,6 @@ import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 
-
 export default {
   name: "App",
   components: {
@@ -74,18 +74,69 @@ export default {
 
       dateInput: null,
       remoteUse:
-        // "localhost"
-        "nla2-pc.levallois.eudoweb.com",
-      // "pno-pc.levallois.eudoweb.com"
+        // "nla2-pc.levallois.eudoweb.com",
+        "pno-pc.levallois.eudoweb.com",
       extObj: {},
       prevResponses: {},
       urlHeader: {},
       tokenName: null,
       tokenValue: null,
-      rootPage: 1
+      rootPage: 1,
+      ifDisplay: [],
+      show: []
     };
   },
   methods: {
+    showQuestion() {
+      // Liste des ID de question à dévoiler
+      var buffer = [];
+
+      // Parcours des pages
+      this.extObj.pages.forEach(page => {
+        // Parcours des questions
+        page.questions.forEach(question => {
+          // Filtrage
+          var scan = [];
+          if (question.type == "LISTE") {
+            scan = [question.response.value];
+          }
+          if (question.type == "MULTI" || question.type == "SIMPLE") {
+            scan = question.response.value;
+          }
+          // Parcours des réponses cochées
+          scan.forEach(id => {
+            // Parcours des règles d'affichage
+            this.ifDisplay.forEach(ifd => {
+              // Inscription au buffer
+              // Si != -1 : contient
+              console.log(ifd);
+              console.log(question);
+              if (
+                ifd.lnkQuestion == question.id &&
+                ifd.lnkReponse.includes(id)
+              ) {
+                buffer.push(ifd.id);
+              }
+            });
+          });
+        });
+      });
+
+      // Parcours des pages
+      this.show = [];
+      this.extObj.pages.forEach(page => {
+        // Parcours des questions
+        page.questions.forEach(question => {
+          // Rétention
+          if (question.isHiding) {
+            if (buffer.indexOf(question.id) != -1) {
+              this.show.push(question.id);
+            }
+          }
+        });
+      });
+    },
+
     postResponse(response, id) {
       let objFormat = {};
       if (typeof response !== "object") {
@@ -96,7 +147,7 @@ export default {
       } else {
         this.objFormat = response;
       }
-      console.log(this.objFormat);
+
       this.$http
         .post(
           "http://" +
@@ -109,7 +160,17 @@ export default {
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
-          console.log("succes");
+          // Parcours des pages
+          this.extObj.pages.forEach(page => {
+            // Parcours des questions
+            page.questions.forEach(question => {
+              if (question.id == this.objFormat.idQuestion) {
+                question.response.value = this.objFormat.value;
+              }
+            });
+          });
+
+          this.showQuestion(null);
         })
         .catch(error => {
           console.log("en erreur");

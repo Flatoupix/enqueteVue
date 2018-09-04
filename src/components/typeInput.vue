@@ -1,9 +1,8 @@
 <template>
   <div>
-
-    <input :aria="question.Tooltoio" v-if="question.type=='TEXT'" class="textField" type="text" @input="select(input,question.id)" v-model="input" />
-    <input :aria="question.Tooltoio" v-if="question.type=='NUM'" type="number" @input="select(input,question.id)" v-model="input" />
-    <textarea :aria="question.Tooltoio" v-if="question.type=='MEMO'" @input="select(input,question.id)" v-model="input" />
+    <input v-if="question.type=='TEXT'" class="textField" type="text" @input="select(input,question.id)" v-model="input" />
+    <input v-if="question.type=='NUM'" type="number" @input="select(input,question.id)" v-model="input" />
+    <textarea v-if="question.type=='MEMO'" @input="select(input,question.id)" v-model="input" />
   </div>
 
 </template>
@@ -38,7 +37,6 @@ export default {
 </script>
 
 <style>
-
 .textField {
   width: 40em;
   text-align: left;

@@ -1,10 +1,8 @@
 <template>
   <div>
-    <!-- <vueDatePicker v-if="inptType=='BIRTHDAY'" class="datePickr" :language="fr" :format="'dd/MM/yy'" @input="select(dateTime,question.id)" v-model="dateTime" />
-    <vueDatePicker v-if="inptType=='DATE'" class="datePickr" :language="fr" :format="'yy MMMM yyyy'" @input="select(dateTime,question.id)" v-model="dateTime" /> -->
-     <vueDatePicker :aria-label="question.Tooltip" class="datePickr" :language="fr"
-     @input="select(dateTime,question.id)" v-model="dateTime" />
-  
+    <vueDatePicker v-if="question.type=='BIRTHDAY'" class="datePickr" :language="fr" :initialView="'year'" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <vueDatePicker v-if="question.type=='DATE'" class="datePickr" :class="datePickr" :language="fr" @input="select(dateTime,question.id)" v-model="dateTime" />
+
   </div>
 </template>
 <style>
