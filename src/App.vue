@@ -13,8 +13,7 @@
 
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
-      <QuestionHolder :question="questions" :ifDisplay="ifDisplay"
-      v-for="questions in page.questions" v-show="!questions.isHiding ||
+      <QuestionHolder :question="questions" v-for="questions in page.questions" v-show="!questions.isHiding ||
       show.includes(questions.id)"
       :key="questions.id">
 
@@ -35,7 +34,7 @@
         </VueSignature>
 
       </QuestionHolder>
-
+   
     </PageHolder>
 
   </div>
@@ -88,37 +87,64 @@ export default {
   },
   methods: {
     showQuestion() {
+      console.log("ShowQuestion");
       // Liste des ID de question à dévoiler
-      var buffer = [];
+      let buffer = [];
+
+      if (this.isDisplay == undefined) {
+        this.extObj.pages.forEach(page => {
+          // Parcours des questions
+          page.questions.forEach(question => {
+            if (question.lnkQuestion != null) {
+              let ids = [];
+              question.lnkResponse.forEach(element => {
+                ids.push(element.id);
+              });
+              //Stockage de toutes les questions concernées dans un tableau de référence
+              this.ifDisplay.push({
+                id: question.id,
+                lnkQuestion: question.lnkQuestion,
+                lnkResponse: ids
+              });
+            }
+          });
+        });
+      }
 
       // Parcours des pages
+
       this.extObj.pages.forEach(page => {
         // Parcours des questions
         page.questions.forEach(question => {
           // Filtrage
-          var scan = [];
-          if (question.type == "LISTE") {
-            scan = [question.response.value];
-          }
-          if (question.type == "MULTI" || question.type == "SIMPLE") {
-            scan = question.response.value;
-          }
-          // Parcours des réponses cochées
-          scan.forEach(id => {
-            // Parcours des règles d'affichage
-            this.ifDisplay.forEach(ifd => {
-              // Inscription au buffer
-              // Si != -1 : contient
-              console.log(ifd);
-              console.log(question);
-              if (
-                ifd.lnkQuestion == question.id &&
-                ifd.lnkReponse.includes(id)
-              ) {
-                buffer.push(ifd.id);
-              }
+          let scan = [];
+          if (question.response != null) {
+            if (question.type.includes("LISTE")) {
+              scan = [question.response.value];
+            }
+            if (
+              question.type.includes("MULTI") ||
+              question.type.includes("SIMPLE")
+            ) {
+              scan = question.response.value;
+            }
+
+            // Parcours des réponses cochées
+            scan.forEach(id => {
+              // Parcours des règles d'affichage
+
+              this.ifDisplay.forEach(ifd => {
+                // Inscription au buffer
+                // Si l'id concerné est contenu dans le tableau
+                if (
+                  ifd.lnkQuestion == question.id &&
+                  ifd.lnkResponse.includes(id)
+                ) {
+                  buffer.push(ifd.id);
+                }
+              });
             });
-          });
+          }
         });
       });
 
@@ -129,7 +155,7 @@ export default {
         page.questions.forEach(question => {
           // Rétention
           if (question.isHiding) {
-            if (buffer.indexOf(question.id) != -1) {
+            if (buffer.includes(question.id)) {
               this.show.push(question.id);
             }
           }
@@ -161,15 +187,17 @@ export default {
         )
         .then(httpresp => {
           // Parcours des pages
-          this.extObj.pages.forEach(page => {
-            // Parcours des questions
-            page.questions.forEach(question => {
-              if (question.id == this.objFormat.idQuestion) {
-                question.response.value = this.objFormat.value;
-              }
-            });
-          });
-
+        
+            this.extObj.pages.forEach(page => {
+              // Parcours des questions
+              page.questions.forEach(question => {
+                if (question.id == this.objFormat.idQuestion && question.response != null) {
+                  question.response.value = this.objFormat.value
+                }
+              })
+            })
+          
+          console.log("succes");
           this.showQuestion(null);
         })
         .catch(error => {
@@ -224,6 +252,8 @@ export default {
         this.prevResponses = response.data.responses;
         this.tokenName = response.data.NameKey;
         this.tokenValue = response.data.ValueKey;
+        this.showQuestion(null);
+        console.log("succes");
       })
       .catch(error => {
         console.log(error);

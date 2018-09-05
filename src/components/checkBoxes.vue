@@ -25,10 +25,6 @@ export default {
   props: {
     question: {
       type: Object,
-      default: () => {}
-    },
-    ifDisplay: {
-      type: Array,
       default: () => []
     }
   },
@@ -46,7 +42,7 @@ export default {
       });
     });
     if (this.question.type == "MULTI") {
-      if (this.question.response != ("" || null || undefined)) {
+      if (this.question.response != (""||null||undefined)) {
         result.selections.forEach(selection => {
           this.question.response.value.forEach(value => {
             if (selection.id == value) {
@@ -56,7 +52,11 @@ export default {
         });
       }
     } else {
+       if (this.question.response != (""||null||undefined)) {
       result.currentTarget = this.question.response.value;
+      } else {
+        result.currentTarget
+      }
     }
     return result;
   },
@@ -70,9 +70,6 @@ export default {
             this.ids.push(element.id);
           }
         });
-
-
-
       } else {
         this.currentTarget = response.id;
         this.ids = [];

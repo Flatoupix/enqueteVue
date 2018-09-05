@@ -14,7 +14,7 @@ export default {
     }
   },
   data() {
-    if (this.question.reponse != "") {
+    if (this.question.response != null) {
       this.savedChoice = parseInt(this.question.response.value);
     } else {
       this.savedChoice = null;

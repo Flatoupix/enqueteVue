@@ -24,11 +24,12 @@ export default {
     }
   },
   data() {
-    if (this.question.reponse != "") {
+    if (this.question.response != null) {
       this.savedChoice = this.question.response.value;
     } else {
       this.savedChoice = null;
     }
+
     return {
       fr: fr,
       dateTime: this.savedChoice

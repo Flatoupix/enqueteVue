@@ -16,7 +16,7 @@ export default {
     }
   },
   data() {
-    if (this.question.response != "") {
+    if (this.question.response != null) {
       this.savedChoice = this.question.response.value;
     } else {
       this.savedChoice = null;

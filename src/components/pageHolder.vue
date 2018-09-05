@@ -16,8 +16,8 @@ export default {
     }
   },
   methods: {
-    select(reponse) {
-      this.currentChoice = reponse
+    select(response) {
+      this.currentChoice = response
     }
   }
 };
