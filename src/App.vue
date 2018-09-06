@@ -17,6 +17,7 @@
       show.includes(questions.id)"
       :key="questions.id">
 
+
         <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
         <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
 
@@ -82,7 +83,8 @@ export default {
       tokenValue: null,
       rootPage: 1,
       ifDisplay: [],
-      show: []
+      show: [],
+      objFormat: {}
     };
   },
   methods: {
@@ -164,7 +166,7 @@ export default {
     },
 
     postResponse(response, id) {
-      let objFormat = {};
+      //let objFormat = {};
       if (typeof response !== "object") {
         this.objFormat = {
           idQuestion: id,
@@ -187,16 +189,19 @@ export default {
         )
         .then(httpresp => {
           // Parcours des pages
-        
-            this.extObj.pages.forEach(page => {
-              // Parcours des questions
-              page.questions.forEach(question => {
-                if (question.id == this.objFormat.idQuestion && question.response != null) {
-                  question.response.value = this.objFormat.value
+
+          this.extObj.pages.forEach(page => {
+            // Parcours des questions
+            page.questions.forEach(question => {
+              if (question.id == this.objFormat.idQuestion) {
+                if (question.response == null) {
+                  question.response = this.objFormat;
                 }
-              })
-            })
-          
+                question.response.value = this.objFormat.value;
+              }
+            });
+          });
+
           console.log("succes");
           this.showQuestion(null);
         })
@@ -304,7 +309,8 @@ h2 {
   margin: 1.4em auto;
 }
 input,
-textarea {
+textarea,
+select {
   border: none;
   border-bottom: 1px solid #bb1515;
   background-color: #efefef;
@@ -314,6 +320,11 @@ textarea {
   font-weight: bold;
   color: #636363;
 }
+select {
+  color:inherit;
+  font-weight:inherit;
+}
+
 .questionsHolder {
   margin: 2em 0;
 }

@@ -1,7 +1,13 @@
 
 <template>
   <div class="buttonsHolder">
-    <button type="button" v-for="response in question.responseChoices" :key="response.id" :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" :id="response.id" @click="select(response)">
+    <Select v-if="question.responseChoices.length > 6"
+    :id="question.id"><option :key="response.id" v-for="response
+        in question.responseChoices">{{response.value}}</option></Select>
+    
+    
+    
+    <button v-else type="button" v-for="response in question.responseChoices" :key="response.id" :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" :id="response.id" @click="select(response)">
       {{ response.value }}</button>
   </div>
 
@@ -28,7 +34,7 @@ export default {
   methods: {
     select(response) {
       this.currentChoice = response.id;
-      
+
       this.$emit("responseInput", {
         idQuestion: this.question.id,
         value: response.id
