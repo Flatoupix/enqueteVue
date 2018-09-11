@@ -1,42 +1,42 @@
 <template>
   <div id="app">
-    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @pageSelected="page" />
+    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" />
     <!-- <image/> -->
-    <div class="bannerImg">
-      <image :src="extObj.pic" />
+    <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
+
     </div>
     <h1>{{extObj.title}}</h1>
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
+    <transition-group name="questionsHolder" mode="in-out">
+      <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+        <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
-    <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+        <QuestionHolder :question="questions" v-for="questions in page.questions" v-show="!questions.isHiding ||
+      show.includes(questions.id)" :key="questions.id">
 
-      <div class="themeTitle">{{ page.questions[0].theme }}</div>
+          <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
+          <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
 
-      <QuestionHolder :question="questions" v-for="questions in page.questions" v-show="!questions.isHiding ||
-      show.includes(questions.id)"
-      :key="questions.id">
+          <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions" />
 
+          <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
 
-        <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
-        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
+          <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
 
-        <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions" />
-
-        <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
-
-        <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
-
-        <typeInput @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
+          <typeInput @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
-        <VueSignature @responseInput="postResponse($event)" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
+          <VueSignature @responseInput="postResponse($event)" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
 
-        </VueSignature>
+          </VueSignature>
 
-      </QuestionHolder>
-   
-    </PageHolder>
+        </QuestionHolder>
+
+      </PageHolder>
+    </transition-group>
+    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" />
+    <PageBrowser :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement"></PageBrowser>
 
   </div>
 
@@ -53,6 +53,7 @@ import VueSignature from "vue-signature-pad";
 import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
+import PageBrowser from "./components/pageBrowser.vue";
 
 export default {
   name: "App",
@@ -66,25 +67,34 @@ export default {
     QuestionHolder,
     VueStars,
     Range,
-    typeInput
+    typeInput,
+    PageBrowser
   },
   data() {
     return {
       input: null,
 
       dateInput: null,
-      remoteUse:
-        // "nla2-pc.levallois.eudoweb.com",
-        "pno-pc.levallois.eudoweb.com",
+      remoteUse: "localhost",
+      // "nla2-pc.levallois.eudoweb.com",
+      // "pno-pc.levallois.eudoweb.com",
       extObj: {},
       prevResponses: {},
+
       urlHeader: {},
+      urlLocation: window.location.origin,
       tokenName: null,
       tokenValue: null,
+
       rootPage: 1,
+      pagesNumber: 0,
+      modelPage: 1,
+
       ifDisplay: [],
       show: [],
-      objFormat: {}
+      objFormat: {},
+
+      noDebug: false
     };
   },
   methods: {
@@ -92,9 +102,11 @@ export default {
       console.log("ShowQuestion");
       // Liste des ID de question à dévoiler
       let buffer = [];
+      this.pagesNumber = 0;
 
       if (this.isDisplay == undefined) {
         this.extObj.pages.forEach(page => {
+          this.pagesNumber++;
           // Parcours des questions
           page.questions.forEach(question => {
             if (question.lnkQuestion != null) {
@@ -178,13 +190,15 @@ export default {
 
       this.$http
         .post(
-          "http://" +
-            this.remoteUse +
-            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/" +
-            "answer?" +
-            this.tokenName +
-            "=" +
-            encodeURIComponent(this.tokenValue),
+          this.noDebug
+            ? this.urlLocation
+            : "http://" +
+              this.remoteUse +
+              "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+              "answer?" +
+              this.tokenName +
+              "=" +
+              encodeURIComponent(this.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
@@ -198,6 +212,7 @@ export default {
                   question.response = this.objFormat;
                 }
                 question.response.value = this.objFormat.value;
+                console.log(this.objFormat);
               }
             });
           });
@@ -209,8 +224,11 @@ export default {
           console.log("en erreur");
         });
     },
-    page(currentPage) {
+    changePage(currentPage) {
       this.rootPage = currentPage.number;
+    },
+    pageIncrement(page) {
+      this.rootPage = page;
     }
   },
   mounted() {
@@ -235,21 +253,25 @@ export default {
 
     this.$http
       .get(
-        "http://" +
-          this.remoteUse +
-          "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
-          this.tokenName +
-          "=" +
-          encodeURIComponent(this.tokenValue)
-      )
-      .then(
-        console.log(
-          "http://" +
+        this.noDebug
+          ? this.urlLocation
+          : "http://" +
             this.remoteUse +
-            "/specif/EUDO_MODULE_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
             this.tokenName +
             "=" +
             encodeURIComponent(this.tokenValue)
+      )
+      .then(
+        console.log(
+          this.noDebug
+            ? this.urlLocation
+            : "http://" +
+              this.remoteUse +
+              "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+              this.tokenName +
+              "=" +
+              encodeURIComponent(this.tokenValue)
         )
       )
       .then(response => {
@@ -321,12 +343,15 @@ select {
   color: #636363;
 }
 select {
-  color:inherit;
-  font-weight:inherit;
+  color: inherit;
+  font-weight: inherit;
 }
-
-.questionsHolder {
-  margin: 2em 0;
+div.bannerImg {
+  height: 26vw;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0 auto;
 }
 div.questionsHolder > div#signature {
   margin: 0 auto;
@@ -338,5 +363,17 @@ div.questionsHolder > div#signature {
   padding: 0.2em;
   font-weight: bold;
   color: #636363;
+}
+
+.questionsHolder {
+  margin: 2em 0;
+  opacity: 1;
+}
+.questionsHolder-move {
+}
+.questionsHolder-enter-active,
+.questionsHolder-leave-active {
+  opacity: 0;
+  transition: opacity 0.25s;
 }
 </style>

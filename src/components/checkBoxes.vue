@@ -2,7 +2,8 @@
   <div class="chkBxHolder">
     <div v-if="question.type=='MULTI'" @click="select(response)" :key="response.id" v-for="response in selections" class="chkBxGrp">
       <div :class="['resetPosition',
-      (response.selected ? 'checked' : '')]">
+      (response.selected ? 'checked' : ''), (question.required ?
+      'required' : '')]">
         <div class="customTick">L</div>
       </div>
       <div :id="response.id" class="chkElmnt" />
@@ -10,7 +11,8 @@
     </div>
     <div v-if="question.type=='SIMPLE'" @click="select(response)" :key="response.id" v-for="response in question.responseChoices" class="chkBxGrp">
       <div :class="['resetPosition',
-      (currentTarget==response.id ? 'checked' : '')]">
+      (currentTarget==response.id ? 'checked' : ''), (question.required ?
+      'required' : '')]">
         <div class="customTick">L</div>
       </div>
       <div :id="response.id" class="chkElmnt" />

@@ -1,13 +1,14 @@
 
 <template>
   <div class="buttonsHolder">
-    <Select v-if="question.responseChoices.length > 6"
-    :id="question.id"><option :key="response.id" v-for="response
-        in question.responseChoices">{{response.value}}</option></Select>
-    
-    
-    
-    <button v-else type="button" v-for="response in question.responseChoices" :key="response.id" :class="['pillBtn', (currentChoice === response.id ? 'active' : '')]" :id="response.id" @click="select(response)">
+    <select @change="select(monselect)" v-if="question.responseChoices.length > 6" v-model="monselect" :id="question.id">
+      <option :key="response.id" v-for="response
+        in question.responseChoices" :responseValue="response" :value="response">{{response.value}}</option>
+    </select>
+
+    <button v-else type="button" v-for="response in question.responseChoices"
+    :key="response.id" :class="['pillBtn', (currentChoice === response.id ?
+    'active' : '')]" :id="response.id" @click="select(response)">
       {{ response.value }}</button>
   </div>
 
@@ -28,16 +29,21 @@ export default {
       this.savedChoice = null;
     }
     return {
+      responseValue:null,
+      monselect:'',
       currentChoice: this.savedChoice
     };
   },
   methods: {
     select(response) {
+      console.log(response)
+      console.log(this.monselect)
       this.currentChoice = response.id;
 
       this.$emit("responseInput", {
         idQuestion: this.question.id,
-        value: response.id
+        value:  response.id
+         
       });
     }
   }

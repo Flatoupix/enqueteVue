@@ -38,7 +38,7 @@ export default {
 
 <style>
 .textField {
-  width: 40em;
+  width: 81vw;
   text-align: left;
   text-indent: 0.5em;
 }

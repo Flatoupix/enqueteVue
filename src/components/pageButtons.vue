@@ -1,6 +1,6 @@
 <template>
   <div class="pageBtnContainer">
-    <button v-for="item in page" :key="item.number" :class="['pageBtn', (currentPage === item.number ? 'active' :
+    <button v-for="item in page" :key="item.number" :class="['pageBtn', (rootPage === item.number ? 'active' :
     '')]" @click="select(item)">{{ item.number }}</button>
   </div>
 </template>
@@ -19,12 +19,12 @@ export default {
   },
   data() {
     return {
-      currentPage: this.rootPage
+    
     };
   },
   methods: {
     select(response) {
-      this.currentPage = response.number;
+   
       this.$route.params.rootPage = response.number;
       
       this.$emit("pageSelected", response);
@@ -34,6 +34,9 @@ export default {
 </script>
 
 <style>
+.pageBtnContainer {
+  margin: 3em 0;
+}
 .pageBtn {
   color: #636363;
   background-color: rgba(63, 63, 63, 0.3);
@@ -44,6 +47,7 @@ export default {
   height: 1.5em;
   border-radius: 100%;
   cursor: pointer;
+      user-select: none;
 }
 .pageBtn.active {
   background-color: #bb1515;
