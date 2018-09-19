@@ -1,6 +1,5 @@
 
 <template>
-
     <div class="pageHolder" :id="page.number" @click="select(page.number)">
       <slot></slot>
   </div>
@@ -17,7 +16,7 @@ export default {
   },
   methods: {
     select(response) {
-      this.currentChoice = response
+      this.currentChoice = response;
     }
   }
 };

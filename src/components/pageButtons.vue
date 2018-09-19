@@ -1,6 +1,6 @@
 <template>
   <div class="pageBtnContainer">
-    <button v-for="item in page" :key="item.number" :class="['pageBtn', (rootPage === item.number ? 'active' :
+    <button v-for="item in page" :key="item.number" :class="['pageBtn', (sessionVars.rootPage === item.number ? 'active' :
     '')]" @click="select(item)">{{ item.number }}</button>
   </div>
 </template>
@@ -17,16 +17,10 @@ export default {
       default: () => 0
     }
   },
-  data() {
-    return {
-    
-    };
-  },
   methods: {
     select(response) {
-   
-      this.$route.params.rootPage = response.number;
-      
+      this.sessionVars.rootPage = response.number;
+
       this.$emit("pageSelected", response);
     }
   }
@@ -47,7 +41,7 @@ export default {
   height: 1.5em;
   border-radius: 100%;
   cursor: pointer;
-      user-select: none;
+  user-select: none;
 }
 .pageBtn.active {
   background-color: #bb1515;

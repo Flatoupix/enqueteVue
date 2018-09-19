@@ -1,10 +1,14 @@
 <template>
   <div class="pageBrowser">
-    <button v-if="localPage>1" @click="prevPage()" class="prevButton">Précédent</button>
-    <button v-if="localPage<pagesNumber" @click="nextPage()" class="nextButton">Suivant</button>
+    <button v-if="sessionVars.rootPage>1" @click="prevPage()" class="prevButton">Précédent</button>
+    <button v-if="sessionVars.rootPage<pagesNumber" @click="nextPage()" class="nextButton">Suivant</button>
+    <button  v-if="sessionVars.rootPage==pagesNumber" @click="isRequired()"
+    class="nextButton validate">Valider</button>
   </div>
 </template>
 <script>
+import sessionVars from "../store/GlobalContextInfos";
+
 export default {
   props: {
     rootPage: {
@@ -18,20 +22,24 @@ export default {
   },
   data() {
     return {
-      localPage: this.rootPage
+      sessionVars: sessionVars
     };
   },
   methods: {
+    isRequired() {
+      this.$emit("scan");
+    },
     nextPage() {
-      if (this.localPage < this.pagesNumber) {
-        this.localPage++;
-        this.$emit("pageSelected", this.localPage);
+      this.isRequired();
+      if (sessionVars.errors.length == 0) {
+        if (sessionVars.rootPage < this.pagesNumber) {
+          sessionVars.rootPage++;
+        }
       }
     },
     prevPage() {
-      if (this.localPage >= this.pagesNumber) {
-        this.localPage--;
-        this.$emit("pageSelected", this.localPage);
+      if (sessionVars.rootPage >= this.pagesNumber) {
+        sessionVars.rootPage--;
       }
     }
   }
@@ -59,6 +67,10 @@ export default {
 }
 .prevButton {
   float: left;
+}
+.pageBrowser > button.validate.nextButton {
+  background-color: #bb1515;
+  color: white;
 }
 .nextButton {
   float: right;

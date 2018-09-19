@@ -1,18 +1,18 @@
 <template>
   <div id="app">
     <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" />
-    <!-- <image/> -->
+   
     <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
     </div>
     <h1>{{extObj.title}}</h1>
     <h2>{{extObj.subTitle}}</h2>
     {{extObj.description}}
-    <transition-group name="questionsHolder" mode="in-out">
-      <PageHolder v-show="rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+      <PageHolder v-show="sessionVars.rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
         <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
-        <QuestionHolder :question="questions" v-for="questions in page.questions" v-show="!questions.isHiding ||
+        <QuestionHolder :id="questions.id" :question="questions" v-for="questions in
+        page.questions" v-show="!questions.isHiding ||
       show.includes(questions.id)" :key="questions.id">
 
           <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
@@ -34,9 +34,11 @@
         </QuestionHolder>
 
       </PageHolder>
-    </transition-group>
-    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" />
-    <PageBrowser :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement"></PageBrowser>
+    <PageButtons :page="extObj.pages"
+    :rootPage="parseInt($route.params.rootPage)" v-model="rootPage"
+    @pageSelected="changePage" />
+    <PageBrowser :pagesNumber="pagesNumber" v-model="rootPage"
+    :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement" @scan="checkForm()"></PageBrowser>
 
   </div>
 
@@ -54,6 +56,7 @@ import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
+import sessionVars from "./store/GlobalContextInfos";
 
 export default {
   name: "App",
@@ -83,10 +86,10 @@ export default {
 
       urlHeader: {},
       urlLocation: window.location.origin,
-      tokenName: null,
-      tokenValue: null,
+      tokenName: sessionVars.tokenName,
+      tokenValue: sessionVars.tokenValue,
 
-      rootPage: 1,
+      rootPage: sessionVars.rootPage,
       pagesNumber: 0,
       modelPage: 1,
 
@@ -98,6 +101,32 @@ export default {
     };
   },
   methods: {
+    checkForm() {
+      console.log("emit");
+
+      this.sessionVars.errors = [];
+
+      this.extObj.pages[this.sessionVars.rootPage - 1].questions.forEach(
+        question => {
+          if (question.required) {
+            if (question.response == null || undefined || "")
+              this.sessionVars.errors.push({
+                id: question.id,
+                question: question.question
+              });
+            console.log(this.sessionVars.rootPage);
+            console.log(this.sessionVars.errors);
+          }
+        }
+      );
+
+      if (this.sessionVars.errors.length != 0) {
+        this.$scrollTo(this.sessionVars.errors[0].id, 1000, {
+          force: false
+        });
+      }
+    },
+
     showQuestion() {
       console.log("ShowQuestion");
       // Liste des ID de question à dévoiler
@@ -225,14 +254,14 @@ export default {
         });
     },
     changePage(currentPage) {
-      this.rootPage = currentPage.number;
+      sessionVars.rootPage = currentPage.number;
     },
     pageIncrement(page) {
-      this.rootPage = page;
+      sessionVars.rootPage = page;
     }
   },
   mounted() {
-    this.rootPage = this.$route.params.rootPage;
+    sessionVars.rootPage = parseInt(this.$route.params.rootPage);
 
     if (this.$route.query.auth) {
       console.log("auth");
@@ -277,8 +306,8 @@ export default {
       .then(response => {
         this.extObj = response.data;
         this.prevResponses = response.data.responses;
-        this.tokenName = response.data.NameKey;
-        this.tokenValue = response.data.ValueKey;
+        sessionVars.tokenName = response.data.NameKey;
+        sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
         console.log("succes");
       })
