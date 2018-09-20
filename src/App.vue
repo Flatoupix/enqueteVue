@@ -1,14 +1,19 @@
 <template>
   <div id="app">
-    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
+    <PageButtons v-show="!isConfirmed" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
 
     <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
     </div>
     <h1>{{extObj.title}}</h1>
     <h2>{{extObj.subTitle}}</h2>
-    {{extObj.description}}
-    <PageHolder v-show="sessionVars.rootPage==page.number" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+
+    <p v-show="!isConfirmed">{{extObj.description}}
+    </p>
+    <p v-show="isConfirmed">{{extObj.closureMsg}}
+    </p>
+
+    <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
       <QuestionHolder :id="questions.id" :question="questions" v-for="questions in
@@ -33,8 +38,9 @@
       </QuestionHolder>
 
     </PageHolder>
-    <PageButtons :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" @scan="checkForm()" />
-    <PageBrowser :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
+    <PageHolder v-show="isConfirmed" :closeMsg="extObj.closureMsg" />
+    <PageButtons v-show="!isConfirmed" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" @scan="checkForm()" />
+    <PageBrowser v-show="!isConfirmed" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
 
   </div>
 
@@ -90,6 +96,8 @@ export default {
       ifDisplay: [],
       show: [],
       objFormat: {},
+
+      isConfirmed: false,
 
       noDebug: false
     };
@@ -224,6 +232,9 @@ export default {
         )
         .then(httpResp => {
           console.log(httpResp);
+          if (httpResp.data.confirmed) {
+            this.isConfirmed = httpResp.data.confirmed;
+          }
         });
     },
     postResponse(response, id) {

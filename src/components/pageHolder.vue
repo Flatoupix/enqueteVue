@@ -1,7 +1,9 @@
 
 <template>
-    <div class="pageHolder" :id="page.number" @click="select(page.number)">
+  <div class="pageHolder">
+    <div :id="page.number" @click="select(page.number)">
       <slot></slot>
+    </div>
   </div>
 
 </template>
