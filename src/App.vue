@@ -1,19 +1,18 @@
 <template>
   <div id="app">
-    <PageButtons v-show="!isConfirmed" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
+    <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
 
     <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
     </div>
     <h1>{{extObj.title}}</h1>
-    <h2>{{extObj.subTitle}}</h2>
+    <h2 v-show="isOpen">{{extObj.subTitle}}</h2>
+    <h2 v-show="!isOpen">{{extObj.closureMsg}}</h2>
 
-    <p v-show="!isConfirmed">{{extObj.description}}
-    </p>
-    <p v-show="isConfirmed">{{extObj.closureMsg}}
-    </p>
+    <p v-show="!isConfirmed && isOpen">{{extObj.description}}</p>
+    <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
 
-    <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+    <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
       <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
       <QuestionHolder :id="questions.id" :question="questions" v-for="questions in
@@ -38,10 +37,10 @@
       </QuestionHolder>
 
     </PageHolder>
-    <PageHolder v-show="isConfirmed" :closeMsg="extObj.closureMsg" />
-    <PageButtons v-show="!isConfirmed" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" @scan="checkForm()" />
-    <PageBrowser v-show="!isConfirmed" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
-
+    <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" />
+    <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" @scan="checkForm()" />
+    <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
+    <div class="pwrBy">Powered by Eudonet</div>
   </div>
 
 </template>
@@ -59,6 +58,7 @@ import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
 import sessionVars from "./store/GlobalContextInfos";
+import datePickerVue from "./components/datePicker.vue";
 
 export default {
   name: "App",
@@ -81,8 +81,7 @@ export default {
 
       dateInput: null,
       remoteUse: "localhost",
-      // "nla2-pc.levallois.eudoweb.com",
-      // "pno-pc.levallois.eudoweb.com",
+
       extObj: {},
       prevResponses: {},
 
@@ -98,6 +97,7 @@ export default {
       objFormat: {},
 
       isConfirmed: false,
+      isOpen: true,
 
       noDebug: false
     };
@@ -336,6 +336,17 @@ export default {
       .then(response => {
         this.extObj = response.data;
         this.prevResponses = response.data.responses;
+
+        let nowDate = new Date();
+        if (
+          nowDate.toISOString() >= response.data.start &&
+          nowDate.toISOString() <= response.data.end
+        ) {
+          console.log(Date());
+          this.isOpen = true;
+        } else {
+          this.isOpen = false;
+        }
         sessionVars.tokenName = response.data.NameKey;
         sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
@@ -428,11 +439,14 @@ div.questionsHolder > div#signature {
   margin: 2em 0;
   opacity: 1;
 }
-.questionsHolder-move {
+::placeholder {
+  opacity: 0.5;
 }
-.questionsHolder-enter-active,
-.questionsHolder-leave-active {
-  opacity: 0;
-  transition: opacity 0.25s;
+.pwrBy {
+  color: #bb1515;
+  font-weight: bold;
+  margin-top: 7%;
+  float: right;
+  margin-right: -12%;
 }
 </style>

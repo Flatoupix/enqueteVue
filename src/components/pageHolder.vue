@@ -1,7 +1,7 @@
 
 <template>
   <div class="pageHolder">
-    <div :id="page.number" @click="select(page.number)">
+    <div v-if="page" :id="page.number" @click="select(page.number)">
       <slot></slot>
     </div>
   </div>

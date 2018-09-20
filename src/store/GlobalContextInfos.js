@@ -7,6 +7,7 @@ const sessionVars = {
   pagesNumber: 0,
   modelPage: 1,
   errors: [],
+
   confirmed: false
 };
 
