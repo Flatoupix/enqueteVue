@@ -2,7 +2,7 @@
   <div class="pageBrowser">
     <button v-if="sessionVars.rootPage>1" @click="prevPage()" class="prevButton">Précédent</button>
     <button v-if="sessionVars.rootPage<pagesNumber" @click="nextPage()" class="nextButton">Suivant</button>
-    <button  v-if="sessionVars.rootPage==pagesNumber" @click="isRequired()"
+    <button  v-if="sessionVars.rootPage==pagesNumber" @click="submitForm()"
     class="nextButton validate">Valider</button>
   </div>
 </template>
@@ -26,6 +26,14 @@ export default {
     };
   },
   methods: {
+    submitForm(response) {
+      this.isRequired();
+
+      if (this.sessionVars.confirmed) {
+        console.log("submit");
+        this.$emit("formConfirmed");
+      }
+    },
     isRequired() {
       this.$emit("scan");
     },

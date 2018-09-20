@@ -6,7 +6,8 @@ const sessionVars = {
   rootPage: 1,
   pagesNumber: 0,
   modelPage: 1,
-  errors: []
+  errors: [],
+  confirmed: false
 };
 
 export default sessionVars;

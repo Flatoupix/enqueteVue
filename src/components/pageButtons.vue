@@ -19,9 +19,15 @@ export default {
   },
   methods: {
     select(response) {
-      this.sessionVars.rootPage = response.number;
-
-      this.$emit("pageSelected", response);
+      if (response.number != this.sessionVars.rootPage) {
+        this.$emit("scan");
+        if (
+          this.sessionVars.errors == 0 ||
+          response.number < this.sessionVars.rootPage
+        ) {
+          this.sessionVars.rootPage = response.number;
+        }
+      }
     }
   }
 };
