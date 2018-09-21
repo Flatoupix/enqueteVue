@@ -6,13 +6,42 @@ import App from "./App";
 import sessionVars from "./store/GlobalContextInfos";
 import axios from "axios";
 import VueScrollTo from "vue-scrollto";
+import VTooltip from "v-tooltip";
 
 Vue.prototype.$http = axios;
-Vue.use(VueScrollTo);
 
-Vue.prototype.sessionVars = sessionVars;
-Vue.config.productionTip = false;
-
+Vue.use(VTooltip, {
+  // Default tooltip placement relative to target element
+  defaultPlacement: "top",
+  // Default CSS classes applied to the tooltip element
+  defaultClass: "vue-tooltip-theme",
+  // Default CSS classes applied to the target element of the tooltip
+  defaultTargetClass: "has-tooltip",
+  // Selector used to get the arrow element in the tooltip template
+  defaultArrowSelector: ".tooltip-arrow, .tooltip__arrow",
+  // Selector used to get the inner content element in the tooltip template
+  defaultInnerSelector: ".tooltip-inner, .tooltip__inner",
+  // Delay (ms)
+  defaultDelay: 500,
+  // Default events that trigger the tooltip
+  defaultTrigger: "hover focus",
+  // Default position offset (px)
+  defaultOffset: 0,
+  // Default container where the tooltip will be appended
+  defaultContainer: "body",
+  defaultBoundariesElement: undefined,
+  defaultPopperOptions: {},
+  // Class added when content is loading
+  defaultLoadingClass: "tooltip-loading",
+  // Displayed when tooltip content is loading
+  defaultLoadingContent: "...",
+  // Hide on mouseover tooltip
+  autoHide: true,
+  // Close tooltip on click on tooltip target?
+  defaultHideOnTargetClick: true,
+  // Auto destroy tooltip DOM nodes (ms)
+  disposeTimeout: 500
+});
 Vue.use(VueScrollTo, {
   container: "body",
   duration: 500,
@@ -26,6 +55,9 @@ Vue.use(VueScrollTo, {
   x: false,
   y: true
 });
+
+Vue.prototype.sessionVars = sessionVars;
+Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
 new Vue({

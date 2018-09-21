@@ -1,7 +1,7 @@
 <template>
   <div>
-    <vueDatePicker :placeholder="question.watermark" :required="question.required" v-if="question.type=='BIRTHDAY'" class="datePickr" :language="fr" :initialView="'year'" @input="select(dateTime,question.id)" v-model="dateTime" />
-    <vueDatePicker :placeholder="question.watermark" :required="question.required" v-if="question.type=='DATE'" class="datePickr" :language="fr" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <vueDatePicker v-tooltip="question.toolTip" :placeholder="question.watermark" :required="question.required" v-if="question.type=='BIRTHDAY'" class="datePickr" :language="fr" :initialView="'year'" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <vueDatePicker v-tooltip="question.toolTip" :placeholder="question.watermark" :required="question.required" v-if="question.type=='DATE'" class="datePickr" :language="fr" @input="select(dateTime,question.id)" v-model="dateTime" />
 
   </div>
 </template>

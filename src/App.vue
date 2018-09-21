@@ -2,7 +2,7 @@
   <div id="app">
     <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
 
-    <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
+    <div class="bannerImg" v-tooltip="'TEST'" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
     </div>
     <h1>{{extObj.title}}</h1>
@@ -27,7 +27,7 @@
         <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
         <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
 
-        <typeInput @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
+        <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
         <VueSignature @responseInput="postResponse($event)" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
@@ -57,8 +57,9 @@ import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
-import sessionVars from "./store/GlobalContextInfos";
+
 import datePickerVue from "./components/datePicker.vue";
+import sessionVars from './store/GlobalContextInfos';
 
 export default {
   name: "App",
@@ -80,13 +81,12 @@ export default {
       input: null,
 
       dateInput: null,
-      remoteUse: "localhost",
 
       extObj: {},
       prevResponses: {},
 
       urlHeader: {},
-      urlLocation: window.location.origin,
+      urlLocation: "",
 
       rootPage: sessionVars.rootPage,
       pagesNumber: 0,
@@ -99,20 +99,20 @@ export default {
       isConfirmed: false,
       isOpen: true,
 
-      noDebug: false
+      debugMode: true
     };
   },
   methods: {
     checkForm() {
       console.log("emit");
 
-      this.sessionVars.errors = [];
+      sessionVars.errors = [];
 
-      this.extObj.pages[this.sessionVars.rootPage - 1].questions.forEach(
+      this.extObj.pages[sessionVars.rootPage - 1].questions.forEach(
         question => {
           if (question.required) {
             if (question.response == null || undefined || "")
-              this.sessionVars.errors.push({
+              sessionVars.errors.push({
                 id: question.id,
                 question: question.question
               });
@@ -120,9 +120,9 @@ export default {
         }
       );
 
-      if (this.sessionVars.errors.length != 0) {
+      if (sessionVars.errors.length != 0) {
         this.$scrollTo(
-          document.getElementById(this.sessionVars.errors[0].id),
+          document.getElementById(sessionVars.errors[0].id),
           500,
           {
             force: false,
@@ -130,7 +130,7 @@ export default {
           }
         );
       } else {
-        this.sessionVars.confirmed = true;
+        sessionVars.confirmed = true;
       }
     },
 
@@ -219,15 +219,12 @@ export default {
       console.log("FinalPost");
       this.$http
         .post(
-          this.noDebug
-            ? this.urlLocation
-            : "http://" +
-              this.remoteUse +
-              "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
-              "confirm?" +
-              sessionVars.tokenName +
-              "=" +
-              encodeURIComponent(sessionVars.tokenValue),
+          this.urlLocation +
+            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+            "confirm?" +
+            sessionVars.tokenName +
+            "=" +
+            encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpResp => {
@@ -249,15 +246,12 @@ export default {
 
       this.$http
         .post(
-          this.noDebug
-            ? this.urlLocation
-            : "http://" +
-              this.remoteUse +
-              "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
-              "answer?" +
-              sessionVars.tokenName +
-              "=" +
-              encodeURIComponent(sessionVars.tokenValue),
+          this.urlLocation +
+            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+            "answer?" +
+            sessionVars.tokenName +
+            "=" +
+            encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
@@ -291,6 +285,12 @@ export default {
     }
   },
   mounted() {
+    if (!this.debugMode) {
+      this.urlLocation = window.urlLocation;
+    } else {
+      this.urlLocation = "http://pno-pc.levallois.eudoweb.com";
+    }
+
     sessionVars.rootPage = parseInt(this.$route.params.rootPage);
 
     if (this.$route.query.auth) {
@@ -312,25 +312,19 @@ export default {
 
     this.$http
       .get(
-        this.noDebug
-          ? this.urlLocation
-          : "http://" +
-            this.remoteUse +
+        this.urlLocation +
+          "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+          sessionVars.tokenName +
+          "=" +
+          encodeURIComponent(sessionVars.tokenValue)
+      )
+      .then(
+        console.log(
+          this.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
             sessionVars.tokenName +
             "=" +
             encodeURIComponent(sessionVars.tokenValue)
-      )
-      .then(
-        console.log(
-          this.noDebug
-            ? this.urlLocation
-            : "http://" +
-              this.remoteUse +
-              "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
-              sessionVars.tokenName +
-              "=" +
-              encodeURIComponent(sessionVars.tokenValue)
         )
       )
       .then(response => {
@@ -441,6 +435,7 @@ div.questionsHolder > div#signature {
 }
 ::placeholder {
   opacity: 0.5;
+  font-size: 0.8em
 }
 .pwrBy {
   color: #bb1515;
@@ -448,5 +443,111 @@ div.questionsHolder > div#signature {
   margin-top: 7%;
   float: right;
   margin-right: -12%;
+}
+.tooltip {
+  display: block !important;
+  z-index: 10000;
+  font-family: Cabin;
+}
+
+.tooltip .tooltip-inner {
+  background: black;
+  color: white;
+  border-radius: 16px;
+  padding: 5px 10px 4px;
+}
+
+.tooltip .tooltip-arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  margin: 5px;
+  border-color: black;
+  z-index: 1;
+}
+
+.tooltip[x-placement^="top"] {
+  margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+  border-width: 5px 5px 0 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  bottom: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+  margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+  border-width: 0 5px 5px 5px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-top-color: transparent !important;
+  top: -5px;
+  left: calc(50% - 5px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+  margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+  border-width: 5px 5px 5px 0;
+  border-left-color: transparent !important;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  left: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+  margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+  border-width: 5px 0 5px 5px;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  right: -5px;
+  top: calc(50% - 5px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+  background: #f9f9f9;
+  color: black;
+  padding: 24px;
+  border-radius: 5px;
+  box-shadow: 0 5px 30px rgba(black, .1);
+}
+
+.tooltip.popover .popover-arrow {
+  border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s;
 }
 </style>

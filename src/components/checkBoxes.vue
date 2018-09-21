@@ -1,5 +1,5 @@
 <template>
-  <div class="chkBxHolder">
+  <div class="chkBxHolder" v-tooltip="question.toolTip" >
     <div v-if="question.type=='MULTI'" @click="select(response)" :key="response.id" v-for="response in selections" class="chkBxGrp">
       <div :class="['resetPosition',
       (response.selected ? 'checked' : ''), (question.required ?

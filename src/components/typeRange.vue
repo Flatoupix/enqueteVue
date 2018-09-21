@@ -1,12 +1,17 @@
 <template>
-  <div class="rangeContainer">
-    <input :aria="question.Tooltoio" class="customRange" type="range" :step="question.step" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
+  <div >
+    <!-- <vue-slider  type="range" :step="question.step" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" /> -->
+    <vue-slider :tooltip="'hover'" :tooltipStyle="{backgroundColor:'#bb1515',borderColor: '#bb1515'}" :processStyle="{backgroundColor:'#bb1515'}" :step="question.step" :max="question.max" :min="question.min" @input="select(inputRange,question.id)" v-model="inputRange" />
   </div>
 </template>
 
 <script>
+import vueSlider from "vue-slider-component";
+
 export default {
-  name: "Range",
+  components: {
+    vueSlider
+  },
   props: {
     question: {
       type: Object,
