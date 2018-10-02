@@ -2,7 +2,7 @@
   <div id="app">
     <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
 
-    <div class="bannerImg" v-tooltip="'TEST'" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
+    <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
     </div>
     <h1>{{extObj.title}}</h1>
@@ -30,10 +30,9 @@
         <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
-        <VueSignature @responseInput="postResponse($event)" v-if="questions.type=='CAPTURE'" id="signature" ref="signaturePad" height="200px" width="50%">
+        <typeSignature v-if="questions.type=='CAPTURE'" @responseInput="postCapture($event)" :question="questions" />
 
-        </VueSignature>
-
+        <typeFile v-if="questions.type=='FILE'" @responseInput="postFile($event)" />
       </QuestionHolder>
 
     </PageHolder>
@@ -52,14 +51,15 @@ import PillButtons from "./components/pillButtons.vue";
 import QuestionHolder from "./components/questionHolder.vue";
 import CheckBoxes from "./components/checkBoxes.vue";
 import DatePicker from "./components/datePicker.vue";
-import VueSignature from "vue-signature-pad";
+import typeSignature from "./components/typeSignature.vue";
 import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
+import typeFile from "./components/typeFile.vue";
 
 import datePickerVue from "./components/datePicker.vue";
-import sessionVars from './store/GlobalContextInfos';
+import sessionVars from "./store/GlobalContextInfos";
 
 export default {
   name: "App",
@@ -69,11 +69,12 @@ export default {
     PillButtons,
     CheckBoxes,
     DatePicker,
-    VueSignature,
     QuestionHolder,
+    typeSignature,
     VueStars,
     Range,
     typeInput,
+    typeFile,
     PageBrowser
   },
   data() {
@@ -86,7 +87,7 @@ export default {
       prevResponses: {},
 
       urlHeader: {},
-      urlLocation: "",
+      urlLocation: "localhost",
 
       rootPage: sessionVars.rootPage,
       pagesNumber: 0,
@@ -104,38 +105,28 @@ export default {
   },
   methods: {
     checkForm() {
-      console.log("emit");
-
       sessionVars.errors = [];
 
       this.extObj.pages[sessionVars.rootPage - 1].questions.forEach(
         question => {
           if (question.required) {
             if (question.response == null || undefined || "")
-              sessionVars.errors.push({
-                id: question.id,
-                question: question.question
-              });
+              sessionVars.errors.push(question.id);
           }
         }
       );
 
       if (sessionVars.errors.length != 0) {
-        this.$scrollTo(
-          document.getElementById(sessionVars.errors[0].id),
-          500,
-          {
-            force: false,
-            offset: -300
-          }
-        );
+        this.$scrollTo(document.getElementById(sessionVars.errors[0]), 500, {
+          force: false,
+          offset: -300
+        });
       } else {
         sessionVars.confirmed = true;
       }
     },
 
     showQuestion() {
-      console.log("ShowQuestion");
       // Liste des ID de question à dévoiler
       let buffer = [];
       this.pagesNumber = 0;
@@ -216,7 +207,7 @@ export default {
       this.objFormat = {
         confirmed: true
       };
-      console.log("FinalPost");
+
       this.$http
         .post(
           this.urlLocation +
@@ -228,13 +219,14 @@ export default {
           JSON.stringify(this.objFormat)
         )
         .then(httpResp => {
-          console.log(httpResp);
           if (httpResp.data.confirmed) {
             this.isConfirmed = httpResp.data.confirmed;
           }
         });
     },
     postResponse(response, id) {
+      let serviceLink = "answer?";
+
       if (typeof response !== "object") {
         this.objFormat = {
           idQuestion: id,
@@ -248,7 +240,7 @@ export default {
         .post(
           this.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
-            "answer?" +
+            serviceLink +
             sessionVars.tokenName +
             "=" +
             encodeURIComponent(sessionVars.tokenValue),
@@ -277,6 +269,40 @@ export default {
           console.log("en erreur");
         });
     },
+    postCapture(response, id) {
+      let serviceLink = "capture?";
+      this.objFormat = response;
+      this.$http
+        .post(
+          this.urlLocation +
+            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+            serviceLink +
+            sessionVars.tokenName +
+            "=" +
+            encodeURIComponent(sessionVars.tokenValue),
+          JSON.stringify(this.objFormat)
+        ).then(httpresp => console.log(httpresp))
+        .catch(error => {
+          console.log("en erreur");
+        });
+    },
+    postFile(response, id) {
+      let serviceLink = "attachment?";
+      this.objFormat = response;
+      this.$http
+        .post(
+          this.urlLocation +
+            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+            serviceLink +
+            sessionVars.tokenName +
+            "=" +
+            encodeURIComponent(sessionVars.tokenValue),
+          JSON.stringify(this.objFormat)
+        )
+        .catch(error => {
+          console.log("en erreur");
+        });
+    },
     changePage(currentPage) {
       sessionVars.rootPage = currentPage.number;
     },
@@ -285,8 +311,11 @@ export default {
     }
   },
   mounted() {
-    if (!this.debugMode) {
-      this.urlLocation = window.urlLocation;
+    if (
+      this.$route.query.debugMode &&
+      this.$route.query.debugMode.includes("on")
+    ) {
+      this.urlLocation = window.location.origin;
     } else {
       this.urlLocation = "http://pno-pc.levallois.eudoweb.com";
     }
@@ -417,17 +446,6 @@ div.bannerImg {
   background-repeat: no-repeat;
   margin: 0 auto;
 }
-div.questionsHolder > div#signature {
-  margin: 0 auto;
-  border: none;
-  border-bottom: 1px solid #bb1515;
-  background-color: #efefef;
-  text-align: center;
-  font-size: 1.4em;
-  padding: 0.2em;
-  font-weight: bold;
-  color: #636363;
-}
 
 .questionsHolder {
   margin: 2em 0;
@@ -435,7 +453,7 @@ div.questionsHolder > div#signature {
 }
 ::placeholder {
   opacity: 0.5;
-  font-size: 0.8em
+  font-size: 0.8em;
 }
 .pwrBy {
   color: #bb1515;
@@ -532,22 +550,22 @@ div.questionsHolder > div#signature {
   color: black;
   padding: 24px;
   border-radius: 5px;
-  box-shadow: 0 5px 30px rgba(black, .1);
+  box-shadow: 0 5px 30px rgba(black, 0.1);
 }
 
 .tooltip.popover .popover-arrow {
   border-color: #f9f9f9;
 }
 
-.tooltip[aria-hidden='true'] {
+.tooltip[aria-hidden="true"] {
   visibility: hidden;
   opacity: 0;
-  transition: opacity .15s, visibility .15s;
+  transition: opacity 0.15s, visibility 0.15s;
 }
 
-.tooltip[aria-hidden='false'] {
+.tooltip[aria-hidden="false"] {
   visibility: visible;
   opacity: 1;
-  transition: opacity .15s;
+  transition: opacity 0.15s;
 }
 </style>

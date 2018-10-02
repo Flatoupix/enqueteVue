@@ -1,5 +1,5 @@
 <template>
-  <div class="chkBxHolder" v-tooltip="question.toolTip" >
+  <div class="chkBxHolder" v-tooltip="question.toolTip">
     <div v-if="question.type=='MULTI'" @click="select(response)" :key="response.id" v-for="response in selections" class="chkBxGrp">
       <div :class="['resetPosition',
       (response.selected ? 'checked' : ''), (question.required ?
@@ -44,7 +44,7 @@ export default {
       });
     });
     if (this.question.type == "MULTI") {
-      if (this.question.response != (""||null||undefined)) {
+      if (this.question.response != ("" || null || undefined)) {
         result.selections.forEach(selection => {
           this.question.response.value.forEach(value => {
             if (selection.id == value) {
@@ -54,10 +54,10 @@ export default {
         });
       }
     } else {
-       if (this.question.response != (""||null||undefined)) {
-      result.currentTarget = this.question.response.value;
+      if (this.question.response != ("" || null || undefined)) {
+        result.currentTarget = this.question.response.value;
       } else {
-        result.currentTarget
+        result.currentTarget;
       }
     }
     return result;

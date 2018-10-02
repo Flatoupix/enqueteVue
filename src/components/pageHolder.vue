@@ -1,6 +1,6 @@
 
 <template>
-  <div class="pageHolder">
+  <div id="pageHolder" class="pageHolder">
     <div v-if="page" :id="page.number" @click="select(page.number)">
       <slot></slot>
     </div>

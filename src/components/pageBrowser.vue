@@ -25,6 +25,11 @@ export default {
     };
   },
   methods: {
+    scrollUp() {
+      this.$scrollTo(sessionVars.rootPage, 0, {
+        force: true
+      });
+    },
     submitForm(response) {
       this.isRequired();
       if (sessionVars.errors.length == 0) {
@@ -42,12 +47,14 @@ export default {
       if (sessionVars.errors.length == 0) {
         if (sessionVars.rootPage < this.pagesNumber) {
           sessionVars.rootPage++;
+          this.scrollUp();
         }
       }
     },
     prevPage() {
       if (sessionVars.rootPage >= this.pagesNumber) {
         sessionVars.rootPage--;
+        this.scrollUp();
       }
     }
   }
