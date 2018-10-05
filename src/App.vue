@@ -56,7 +56,6 @@ import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
 import typeFile from "./components/typeFile.vue";
-
 import datePickerVue from "./components/datePicker.vue";
 import sessionVars from "./store/GlobalContextInfos";
 
@@ -330,7 +329,7 @@ export default {
         });
       }
       if (!noReload) {
-        //location.reload()
+        location.reload()
       }
     }
   },

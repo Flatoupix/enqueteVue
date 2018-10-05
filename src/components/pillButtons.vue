@@ -1,7 +1,7 @@
 
 <template>
-  <div v-tooltip="question.toolTip" class="buttonsHolder">
-    <select @change="select(monselect)" v-if="question.responseChoices.length > 6" v-model="monselect" :id="question.id">
+  <div  class="buttonsHolder">
+    <select v-tooltip="question.toolTip" @change="select(myValue)" v-if="question.responseChoices.length > 6" v-model="myValue" :id="question.id">
       <option :key="response.id" v-for="response
         in question.responseChoices" :responseValue="response" :value="response">{{response.value}}</option>
     </select>
@@ -29,7 +29,7 @@ export default {
     }
     return {
       responseValue: null,
-      monselect: "",
+      myValue: "",
       currentChoice: this.savedChoice
     };
   },
