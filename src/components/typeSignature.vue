@@ -1,10 +1,9 @@
 <template>
-  <div id="typeSignature">
-    <div class="lockSign" :style="{ width:sizes.width + 'px', height:sizes.height+'px'}"></div>
-    <VueSignaturePad :width="sizes.width" :height="sizes.height" :saveType="'image/svg+xml'" ref="signaturePad" />
+  <div id="typeSignature" ref="typeSignature">
+    <VueSignaturePad :class="['VueSignaturePad',signed ? 'locked':'']" :width="sizes.width" :height="sizes.height" :saveType="'image/svg+xml'" ref="signaturePad" />
+    <h4 v-show="signed">Document signé</h4>
     <button v-show="!signed" @click="undo">Retour</button>
     <button v-if="!signed" class="saveButton" @click="save(question.id)">Signer</button>
-
   </div>
 </template>
 <script>
@@ -35,21 +34,35 @@ export default {
     },
     save(id, type) {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
-      this.signed = true;
+
+      this.sign();
+      this.sizeRefresh();
       this.$emit("responseInput", {
         idQuestion: id,
         value: data
       });
+    },
+    sizeRefresh() {
+      this.sizes.height = this.$el.firstElementChild.offsetHeight.toString();
+      this.sizes.width = this.$el.firstElementChild.offsetWidth.toString();
+    },
+    sign() {
+      this.signed = true;
+      this.$refs.signaturePad.lockSignaturePad();
     }
   },
   mounted() {
-    this.sizes.height = this.$el.firstElementChild.offsetHeight.toString();
-    this.sizes.width = this.$el.firstElementChild.offsetWidth.toString();
+    if (this.question.response != null) {
+      if (this.question.response.idQuestion == this.question.id) {
+        this.sign();
+        this.$refs.signaturePad.fromDataURL(this.question.response.value);
+      }
+    }
   }
 };
 </script>
 <style>
-div#typeSignature > div:nth-child(2) {
+div#typeSignature > div.VueSignaturePad {
   margin: 0 auto;
   border: none;
   border-bottom: 1px solid #bb1515;
@@ -60,6 +73,8 @@ div#typeSignature > div:nth-child(2) {
   font-weight: bold;
   color: #636363;
   margin-bottom: 1em;
+  width: 25em;
+  height: 10em;
 }
 div#typeSignature button {
   background-color: rgba(63, 63, 63, 0.3);
@@ -74,9 +89,8 @@ div#typeSignature button.saveButton {
   background-color: #bb1515;
   color: white;
 }
-.lockSign {
-  display: block;
-  position: absolute;
+.locked {
+  opacity: 0.5;
 }
 h4 {
   color: #15bb57;

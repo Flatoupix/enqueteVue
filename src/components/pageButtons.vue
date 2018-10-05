@@ -26,6 +26,7 @@ export default {
           response.number < this.sessionVars.rootPage
         ) {
           this.sessionVars.rootPage = response.number;
+          this.$emit("refresh");
           this.$scrollTo(pageHolder, 500, {
             force: false
           });

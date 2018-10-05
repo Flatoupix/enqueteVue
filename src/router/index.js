@@ -11,8 +11,9 @@ export default new Router({
       component: App
     },
     {
+      name:"enquete",
       path: '/:rootPage',
-      name: this.rootPage
+     
     }
   ]
 })

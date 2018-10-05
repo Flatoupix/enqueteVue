@@ -1,9 +1,6 @@
 <template>
   <div>
-    <!-- <vue-slider  type="range" :step="question.step" :max="question.max"
-    :min="question.min" @input="select(inputRange,question.id)"
-    v-model="inputRange" /> -->
-    <!-- <div class="minRange">{{question.min}}</div> -->
+
     <vue-slider :tooltip="'hover'"
     :tooltipStyle="{backgroundColor:'#bb1515',borderColor: '#bb1515'}"
     :processStyle="{backgroundColor:'#bb1515'}" :step="question.step"
@@ -11,7 +8,7 @@
     @input="select(inputRange,question.id)" 
     v-model="inputRange"  :piecewiseLabel="true">
     </vue-slider>
-    <!-- <div class="maxRange">{{question.max}}</div> -->
+ 
   </div>
 </template>
 
@@ -32,7 +29,7 @@ export default {
     if (this.question.response != null) {
       this.savedChoice = parseInt(this.question.response.value);
     } else {
-      this.savedChoice = parseInt(this.question.min);
+      this.savedChoice = parseInt(this.question.max)/2;
     }
     return {
       inputRange: this.savedChoice

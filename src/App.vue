@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @pageSelected="changePage" />
+    <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @refresh="refreshPage" />
 
-    <div class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
+    <div v-show="sessionVars.rootPage==1" class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
     </div>
-    <h1>{{extObj.title}}</h1>
-    <h2 v-show="isOpen">{{extObj.subTitle}}</h2>
+    <h1 v-show=" sessionVars.rootPage==1">{{extObj.title}}</h1>
+    <h2 v-show="isOpen&& sessionVars.rootPage==1">{{extObj.subTitle}}</h2>
     <h2 v-show="!isOpen">{{extObj.closureMsg}}</h2>
 
-    <p v-show="!isConfirmed && isOpen">{{extObj.description}}</p>
+    <p v-show="!isConfirmed && isOpen && sessionVars.rootPage==1">{{extObj.description}}</p>
     <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
 
     <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
@@ -30,15 +30,14 @@
         <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
-        <typeSignature v-if="questions.type=='CAPTURE'" @responseInput="postCapture($event)" :question="questions" />
+        <typeSignature v-show="questions.type=='CAPTURE'" @responseInput="postCapture($event)" :question="questions" />
 
-        <typeFile v-if="questions.type=='FILE'" @responseInput="postFile($event)" />
+        <typeFile v-show="questions.type=='FILE'" @responseInput="postFile($event)" :question="questions" />
       </QuestionHolder>
 
     </PageHolder>
     <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" />
-    <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" v-model="rootPage" @pageSelected="changePage" @scan="checkForm()" />
-    <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @pageSelected="pageIncrement" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
+    <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @refresh="refreshPage" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
     <div class="pwrBy">Powered by Eudonet</div>
   </div>
 
@@ -210,7 +209,7 @@ export default {
 
       this.$http
         .post(
-          this.urlLocation +
+          sessionVars.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
             "confirm?" +
             sessionVars.tokenName +
@@ -238,7 +237,7 @@ export default {
 
       this.$http
         .post(
-          this.urlLocation +
+          sessionVars.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
             serviceLink +
             sessionVars.tokenName +
@@ -274,14 +273,15 @@ export default {
       this.objFormat = response;
       this.$http
         .post(
-          this.urlLocation +
+          sessionVars.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
             serviceLink +
             sessionVars.tokenName +
             "=" +
             encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
-        ).then(httpresp => console.log(httpresp))
+        )
+        .then(httpresp => console.log(httpresp))
         .catch(error => {
           console.log("en erreur");
         });
@@ -291,7 +291,7 @@ export default {
       this.objFormat = response;
       this.$http
         .post(
-          this.urlLocation +
+          sessionVars.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
             serviceLink +
             sessionVars.tokenName +
@@ -303,27 +303,47 @@ export default {
           console.log("en erreur");
         });
     },
-    changePage(currentPage) {
-      sessionVars.rootPage = currentPage.number;
-    },
-    pageIncrement(page) {
-      sessionVars.rootPage = page;
+    refreshPage(noReload) {
+      this.$router.push({
+        name: "enquete",
+        params: {
+          rootPage: sessionVars.rootPage
+        }
+      });
+      if (sessionVars.tokenName == "com") {
+        this.$router.push({
+          query: {
+            com: sessionVars.tokenValue
+          }
+        });
+      } else if (sessionVars.tokenName == "auth") {
+        this.$router.push({
+          query: {
+            auth: sessionVars.tokenValue
+          }
+        });
+      } else if (sessionVars.tokenName == "ano") {
+        this.$router.push({
+          query: {
+            ano: sessionVars.tokenValue
+          }
+        });
+      }
+      if (!noReload) {
+        //location.reload()
+      }
     }
   },
   mounted() {
-    if (
-      this.$route.query.debugMode &&
-      this.$route.query.debugMode.includes("on")
-    ) {
-      this.urlLocation = window.location.origin;
+    if (this.debugMode) {
+      sessionVars.urlLocation = "http://pno-pc.levallois.eudoweb.com";
     } else {
-      this.urlLocation = "http://pno-pc.levallois.eudoweb.com";
+      sessionVars.urlLocation = window.location.origin;
     }
 
     sessionVars.rootPage = parseInt(this.$route.params.rootPage);
 
     if (this.$route.query.auth) {
-      console.log("auth");
       // l'utilisateur est authentifié : le token ne change pas
       sessionVars.tokenName = "auth";
       sessionVars.tokenValue = this.$route.query.auth;
@@ -341,7 +361,7 @@ export default {
 
     this.$http
       .get(
-        this.urlLocation +
+        sessionVars.urlLocation +
           "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
           sessionVars.tokenName +
           "=" +
@@ -349,7 +369,7 @@ export default {
       )
       .then(
         console.log(
-          this.urlLocation +
+          sessionVars.urlLocation +
             "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
             sessionVars.tokenName +
             "=" +
@@ -373,6 +393,7 @@ export default {
         sessionVars.tokenName = response.data.NameKey;
         sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
+        this.refreshPage(true);
         console.log("succes");
       })
       .catch(error => {

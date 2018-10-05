@@ -1,12 +1,18 @@
 <template>
-  <div id="fileUpload">
-    <VueUploadComponent ref="upload" v-model="files" @input-file="inputFile" @input-filter="inputFilter">
-      Envoyer un fichier
-    </VueUploadComponent>
+  <div>
+    <file-pond :server="sessionVars.urlLocation + sessionVars.servicePath+ 'attachment?'+
+    sessionVars.tokenName + '=' +encodeURIComponent(sessionVars.tokenValue) +
+    '&q='+question.id" name="FileUpload" ref="pond" label-idle="Déposez vos
+    fichiers ici..." allow-multiple="true" />
   </div>
 </template>
 <script>
-import VueUploadComponent from "vue-upload-component";
+import vueFilePond from "vue-filepond";
+
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 
 export default {
   props: {
@@ -15,49 +21,11 @@ export default {
       default: () => {}
     }
   },
-  data() {
-    return {
-      files: null
-    };
-  },
   components: {
-    VueUploadComponent
-  },
-  methods: {
-    select(inputFile) {
-      this.files = inputFile;
-
-      this.$emit("responseInput", {
-        idQuestion: this.question.id,
-        value: inputFile
-      });
-    },
-    inputFile: function(newFile, oldFile) {
-      if (newFile && oldFile && !newFile.active && oldFile.active) {
-        // Get response data
-        console.log("response", newFile.response);
-        if (newFile.xhr) {
-          //  Get the response status code
-          console.log("status", newFile.xhr.status);
-        }
-      }
-    },
-
-    inputFilter: function(newFile, oldFile, prevent) {
-      if (newFile && !oldFile) {
-        // Filter non-image file
-        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
-          return prevent();
-        }
-      }
-
-      // Create a blob field
-      newFile.blob = "";
-      let URL = window.URL || window.webkitURL;
-      if (URL && URL.createObjectURL) {
-        newFile.blob = URL.createObjectURL(newFile.file);
-      }
-    }
+    vueFilePond: vueFilePond(
+      FilePondPluginFileValidateType,
+      FilePondPluginImagePreview
+    )
   }
 };
 </script>

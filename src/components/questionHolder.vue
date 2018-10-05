@@ -2,7 +2,7 @@
     <div class="questionsHolder">
         <h3 v-if="sessionVars.errors.length >= 1" :class="[question.required ? 'required' : '']"> {{ question.question }}
         </h3>
-        <h3 v-else> {{ question.question }}</h3>
+        <h3 v-else> {{ question.question }} <span v-if="question.required" style="color:#bb1515">*</span></h3>
         <slot></slot>
     </div>
 </template>
