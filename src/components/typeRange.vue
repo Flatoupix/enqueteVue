@@ -29,7 +29,7 @@ export default {
     if (this.question.response != null) {
       this.savedChoice = parseInt(this.question.response.value);
     } else {
-      this.savedChoice = parseInt(this.question.max)/2;
+      this.savedChoice = parseInt(this.question.min);
     }
     return {
       inputRange: this.savedChoice

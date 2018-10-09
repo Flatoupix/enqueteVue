@@ -34,7 +34,7 @@ export default {
       this.isRequired();
       if (sessionVars.errors.length == 0) {
         if (this.sessionVars.confirmed) {
-          console.log("submit");
+  
           this.$emit("formConfirmed");
         }
       }
