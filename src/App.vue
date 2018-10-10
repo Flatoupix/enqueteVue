@@ -22,7 +22,8 @@
         <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
         <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
 
-        <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE'" :question="questions" />
+        <Range type="range" @responseInput="postResponse($event)"
+        v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage" :question="questions" />
 
         <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
         <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
@@ -30,9 +31,10 @@
         <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
-        <typeSignature v-show="questions.type=='CAPTURE'" @responseInput="postCapture($event)" :question="questions" />
+        <typeSignature  v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage"
+        @responseInput="postCapture($event)"   :question="questions" />
 
-        <typeFile v-show="questions.type=='FILE'" @responseInput="postFile($event)" :question="questions" />
+        <typeFile v-if="questions.type=='FILE'" @responseInput="postFile($event)" :question="questions" />
       </QuestionHolder>
 
     </PageHolder>
@@ -329,7 +331,7 @@ export default {
         });
       }
       if (!noReload) {
-        location.reload()
+        // sessionVars.pageRefresh = true
       }
     }
   },

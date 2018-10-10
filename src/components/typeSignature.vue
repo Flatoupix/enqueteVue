@@ -1,6 +1,6 @@
 <template>
   <div id="typeSignature" ref="typeSignature">
-    <VueSignaturePad :class="['VueSignaturePad',signed ? 'locked':'']" :width="sizes.width" :height="sizes.height" :saveType="'image/svg+xml'" ref="signaturePad" />
+    <VueSignaturePad :class="['VueSignaturePad',signed ? 'locked':'']" :saveType="'image/svg+xml'" ref="signaturePad" />
     <h4 v-show="signed">Document signé</h4>
     <button v-show="!signed" @click="undo">Retour</button>
     <button v-if="!signed" class="saveButton" @click="save(question.id)">Signer</button>
@@ -14,6 +14,10 @@ export default {
     question: {
       type: Object,
       default: () => {}
+    },
+    pageNumber: {
+      type: Number,
+      default: () => 0
     }
   },
   components: {
@@ -36,16 +40,13 @@ export default {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
 
       this.sign();
-      this.sizeRefresh();
+
       this.$emit("responseInput", {
         idQuestion: id,
         value: data
       });
     },
-    sizeRefresh() {
-      this.sizes.height = this.$el.firstElementChild.offsetHeight.toString();
-      this.sizes.width = this.$el.firstElementChild.offsetWidth.toString();
-    },
+
     sign() {
       this.signed = true;
       this.$refs.signaturePad.lockSignaturePad();
