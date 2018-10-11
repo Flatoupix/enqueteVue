@@ -8,7 +8,10 @@
     'attached':'']" @click="submitFile()">Envoyer</div>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
-      <div class="file" :key="index" v-for="(file, index) in files">
+  
+      <div :class="['file',uppedFiles.includes(file.lastModified)?'upped':'']"
+      :key="index" v-for="(file, index) in files">
+          <div class="msgUpd">Fichier envoyé</div>
         <div class="fileTitle">{{file.name}}</div>
         <div class="closeBtn" @click="deleteFile(index)">+</div>
       </div>
@@ -37,7 +40,6 @@ export default {
         encodeURIComponent(this.sessionVars.tokenValue),
       uppedFiles: [],
       fileIDs: []
-
     };
   },
   methods: {
@@ -46,6 +48,8 @@ export default {
       this.sessionVars.serviceName = "attachment?";
       for (const file of this.files) {
         formData.append("FileUpload", file);
+        this.uppedFiles.push(file.lastModified);
+        console.log(this.uppedFiles);
       }
       formData.append("Quest", this.question.id);
       this.$http
@@ -92,7 +96,7 @@ export default {
           console.log(resp);
           console.log("DELETE SUCCESS!!");
           this.files.splice(index, 1);
-          this.fileIDs.splice(index,1)
+          this.fileIDs.splice(index, 1);
         })
         .catch(function() {
           console.log("FAILURE DELETE!!");
@@ -105,7 +109,8 @@ export default {
     handleFileUpload() {
       for (const file of this.$refs.fileattachment.files) {
         this.files.push(file);
-        console.log(this.files);
+
+        console.log(this.uppedFiles);
       }
     }
   }
@@ -149,10 +154,12 @@ div#fileUpload > div.panelDown > div.file {
   height: 2em;
   line-height: 2em;
   background-color: #d7d7d7;
+  transition: 0.5s;
+  white-space: nowrap;
+  margin-left: -28em;
 }
-div.file.upped {
-  margin-top: 1em;
-    background-color: #88da84;
+div#fileUpload > div.panelDown > div.file.upped {
+      margin-left: 0;
 }
 div#fileUpload > div.panelDown > div.file:hover > div.closeBtn {
   display: inline-block;
@@ -182,8 +189,23 @@ div#fileUpload > div.panelDown > div.file > div.fileTitle {
   overflow-x: hidden;
   display: inline-block;
 }
+#fileUpload > div.panelDown.down > div.file > * {
+  display: inline-block;
+}
+
+#fileUpload > div.panelDown.down > div.file > div.msgUpd {
+        vertical-align: 0.7em;
+    width: 18em;
+    height: 1.9em;
+    color: #bb1515;
+    background-color: white;
+    border-bottom: 1px solid #bb1515;
+}
+
+
 div#fileUpload > div.panelDown.down {
   top: 0;
+  overflow: hidden;
 }
 div#fileUpload > div.submitFile {
   display: inline-block;
@@ -204,7 +226,6 @@ div#fileUpload > div.submitFile.attached {
   margin-left: -0.2em;
 }
 div#fileUpload > label > input#attachment {
-
   display: none;
 }
 </style>
