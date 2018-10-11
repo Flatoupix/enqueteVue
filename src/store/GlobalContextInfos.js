@@ -2,8 +2,9 @@ const sessionVars = {
   urlLocation: window.location.origin,
   tokenName: null,
   tokenValue: null,
-  servicePath: "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/",
-
+  servicePath:
+    "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/",
+  serviceName: "",
   rootPage: 1,
   pagesNumber: 0,
   modelPage: 1,

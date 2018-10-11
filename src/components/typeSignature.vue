@@ -93,7 +93,7 @@ div#typeSignature button.saveButton {
 .locked {
   opacity: 0.5;
 }
-h4 {
+div#typeSignature h4 {
   color: #15bb57;
 }
 </style>

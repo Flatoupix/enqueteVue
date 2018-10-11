@@ -235,7 +235,6 @@ export default {
       } else {
         this.objFormat = response;
       }
-
       this.$http
         .post(
           sessionVars.urlLocation +
