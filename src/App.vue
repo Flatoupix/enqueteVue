@@ -34,11 +34,12 @@
         <typeSignature  v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage"
         @responseInput="postCapture($event)"   :question="questions" />
 
-        <typeFile v-if="questions.type=='FILE'" @responseInput="postFile($event)" :question="questions" />
+       
       </QuestionHolder>
 
     </PageHolder>
-    <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" />
+    <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" /> 
+    <typeFile  @responseInput="postFile($event)"  />
     <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @refresh="refreshPage" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
     <div class="pwrBy">Powered by Eudonet</div>
   </div>
@@ -336,7 +337,7 @@ export default {
   },
   mounted() {
     if (this.debugMode) {
-      sessionVars.urlLocation = "http://pno-pc.levallois.eudoweb.com";
+      sessionVars.urlLocation = "http://nla2-pc.levallois.eudoweb.com";
     } else {
       sessionVars.urlLocation = window.location.origin;
     }

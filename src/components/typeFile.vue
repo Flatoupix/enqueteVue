@@ -11,9 +11,9 @@
   
       <div :class="['file',uppedFiles.includes(file.lastModified)?'upped':'']"
       :key="index" v-for="(file, index) in files">
-          <div class="msgUpd">Fichier envoyé</div>
-        <div class="fileTitle">{{file.name}}</div>
-        <div class="closeBtn" @click="deleteFile(index)">+</div>
+          <div class="msgUpd">{{file.name}} envoyé !<div class="closeBtn" @click="deleteFile(index)">+</div></div>
+        <div class="fileTitle">{{file.name}}<div class="closeBtn" @click="deleteFile(index)">+</div></div>
+        
       </div>
     </div>
 
@@ -77,7 +77,7 @@ export default {
 
       let objFormat = {
         name: "FileDelete",
-        id: this.question.id,
+        // id: this.question.id,
         uidFile: this.fileIDs[index],
         extension: ""
       };
@@ -100,6 +100,11 @@ export default {
         })
         .catch(function() {
           console.log("FAILURE DELETE!!");
+
+          // A SUPPRIMER --
+
+          this.files.splice(index, 1);
+          this.fileIDs.splice(index, 1);
         });
     },
 
@@ -117,6 +122,24 @@ export default {
 };
 </script>
 <style scoped>
+@keyframes submitOn {
+  from {
+    opacity: 0;
+    margin-right: -2em;
+  }
+  to {
+    opacity: 1;
+    margin-right: 0;
+  }
+}
+@keyframes fileAppears {
+  form {
+    margin-top:-2em;
+  }
+  to {
+      margin-top:0em;
+  }
+}
 div#fileUpload {
   margin: auto;
   width: 35rem;
@@ -145,27 +168,22 @@ div#fileUpload > div.panelDown {
   color: #8b8b8b;
   z-index: 1;
   position: relative;
-  top: -2em;
-  -webkit-transition: 0.5s;
-  transition: 0.5s;
+  overflow: hidden;
 }
 
-div#fileUpload > div.panelDown > div.file {
-  height: 2em;
-  line-height: 2em;
-  background-color: #d7d7d7;
-  transition: 0.5s;
-  white-space: nowrap;
-  margin-left: -28em;
-}
+
 div#fileUpload > div.panelDown > div.file.upped {
-      margin-left: 0;
+  margin-right: -18em;
+  margin-left: 0;
 }
-div#fileUpload > div.panelDown > div.file:hover > div.closeBtn {
+div#fileUpload > div.panelDown > div.file:hover div > div.closeBtn {
   display: inline-block;
   opacity: 1;
 }
-div#fileUpload > div.panelDown > div.file > div.closeBtn {
+div#fileUpload > div.panelDown > div.file > div {
+  position: relative;
+}
+div#fileUpload > div.panelDown > div.file div > div.closeBtn {
   background-color: #333;
   border-radius: 1em;
   color: white;
@@ -179,33 +197,33 @@ div#fileUpload > div.panelDown > div.file > div.closeBtn {
   display: inline-block;
   cursor: pointer;
   transition: 0.5s;
+  position: absolute;
+  right: 0.5em;
+  top: 0.5em;
+  text-indent: initial;
 }
 div#fileUpload > div.panelDown > div.file > div.fileTitle {
-  font-size: 0.8em;
   color: #404040;
-  width: 80%;
   white-space: nowrap;
   text-overflow: ellipsis;
-  overflow-x: hidden;
-  display: inline-block;
+  overflow: hidden;
+  text-indent: 0.8em;
 }
 #fileUpload > div.panelDown.down > div.file > * {
-  display: inline-block;
+  height: 2em;
+  line-height: 2em;
 }
 
 #fileUpload > div.panelDown.down > div.file > div.msgUpd {
-        vertical-align: 0.7em;
-    width: 18em;
-    height: 1.9em;
-    color: #bb1515;
-    background-color: white;
-    border-bottom: 1px solid #bb1515;
+  height: 2em;
+  line-height: 2em;
+  color: #bb1515;
+  background-color: #fff;
+  border-bottom: 0.1em solid #bb1515;
 }
 
-
 div#fileUpload > div.panelDown.down {
-  top: 0;
-  overflow: hidden;
+  
 }
 div#fileUpload > div.submitFile {
   display: inline-block;
@@ -216,14 +234,29 @@ div#fileUpload > div.submitFile {
   cursor: pointer;
   z-index: 100;
   position: relative;
-  margin-left: 1em;
+  display: none;
+  margin-left: -0.2em;
   opacity: 0;
-
-  transition: 0.5s;
+}
+div#fileUpload > div.panelDown > div.file {
+  background-color: #d7d7d7;
+  -webkit-transition: 0.5s;
+  white-space: nowrap;
+  margin-left: -18em;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 2em;
+  animation: 0.25s 0.25s fileAppears both ;
+ 
+  margin-top:-2em;
+  opacity: 1;
+  z-index: -1;
 }
 div#fileUpload > div.submitFile.attached {
+  animation-fill-mode: forwards;
+  animation: 0.25s submitOn;
+  display: inline-block;
   opacity: 1;
-  margin-left: -0.2em;
 }
 div#fileUpload > label > input#attachment {
   display: none;
