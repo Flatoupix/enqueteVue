@@ -1,5 +1,4 @@
 module.exports = {
-  baseUrl:"",
   filenameHashing: false,
   outputDir: "../Build",
   assetsDir: "static",
@@ -7,7 +6,7 @@ module.exports = {
     proxy: {
       "/services": {
         target:
-          "http://localhost/Specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/"
+          "http://pno-pc.levallois.eudoweb.com/Specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/"
       }
     }
     

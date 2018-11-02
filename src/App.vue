@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <div v-if="loaded ">
+    <div class="badToken" v-if="errored">
+      <h2>Le token n'est pas bon...</h2>
+    </div>
+    <div v-if="loaded&&!errored">
       <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @refresh="refreshPage" />
 
       <div v-show="sessionVars.rootPage==1 && extObj.pic!=null" class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
@@ -92,7 +95,7 @@ export default {
       prevResponses: {},
 
       urlHeader: {},
-      urlLocation: "localhost",
+      urlLocation: window.location.origin,
 
       rootPage: sessionVars.rootPage,
       pagesNumber: 0,
@@ -106,6 +109,8 @@ export default {
       isOpen: true,
 
       loaded: false,
+      errored: false,
+
       debugMode: false
     };
   },
@@ -161,6 +166,7 @@ export default {
       // Parcours des pages
 
       this.extObj.pages.forEach(page => {
+        this.pagesNumber++;
         // Parcours des questions
         page.questions.forEach(question => {
           // Filtrage
@@ -339,12 +345,6 @@ export default {
     }
   },
   mounted() {
-    if (this.debugMode) {
-      sessionVars.urlLocation = "http://pno-pc.levallois.eudoweb.com";
-    } else {
-      sessionVars.urlLocation = window.location.origin;
-    }
-
     sessionVars.rootPage = parseInt(this.$route.params.rootPage);
 
     if (this.$route.query.auth) {
@@ -620,5 +620,8 @@ div.bannerImg {
   -webkit-animation: loadLoop infinite 1s;
   animation: loadLoop infinite 1s ease-in-out;
   margin: 40vh auto;
+}
+.badToken {
+  margin: 10em auto;
 }
 </style>
