@@ -7,7 +7,7 @@
     </select>
 
     <button v-else v-tooltip="question.toolTip" type="button" v-for="response in question.responseChoices" :key="response.id" :class="['pillBtn', (currentChoice === response.id ?
-    'active' : '')]" :id="response.id" @click="select(response, question.type)">
+    'active' : '')]" :id="response.id" @click="select(response)">
       {{ response.value }}</button>
   </div>
 

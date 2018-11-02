@@ -8,12 +8,13 @@
     'attached':'']" @click="submitFile()">Envoyer</div>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
-  
-      <div :class="['file',uppedFiles.includes(file.lastModified)?'upped':'']"
-      :key="index" v-for="(file, index) in files">
-          <div class="msgUpd">{{file.name}} envoyé !<div class="closeBtn" @click="deleteFile(index)">+</div></div>
-        <div class="fileTitle">{{file.name}}<div class="closeBtn" @click="deleteFile(index)">+</div></div>
-        
+
+      <div :class="['file',uppedFiles.includes(file.lastModified)?'upped':'']" :key="index" v-for="(file, index) in files">
+        <div class="msgUpd"><span>{{file.name}}</span> envoyé !<div class="closeBtn" @click="deleteFile(index)">+</div>
+        </div>
+        <div class="fileTitle">{{file.name}}<div class="closeBtn" @click="deleteFile(index)">+</div>
+        </div>
+
       </div>
     </div>
 
@@ -32,7 +33,6 @@ export default {
     return {
       files: [],
       Url:
-        this.sessionVars.urlLocation +
         this.sessionVars.servicePath +
         this.sessionVars.serviceName +
         this.sessionVars.tokenName +
@@ -54,8 +54,7 @@ export default {
       formData.append("Quest", this.question.id);
       this.$http
         .post(
-          this.sessionVars.urlLocation +
-            this.sessionVars.servicePath +
+          this.sessionVars.servicePath +
             this.sessionVars.serviceName +
             this.sessionVars.tokenName +
             "=" +
@@ -84,8 +83,7 @@ export default {
 
       this.$http
         .post(
-          this.sessionVars.urlLocation +
-            this.sessionVars.servicePath +
+          this.sessionVars.servicePath +
             this.sessionVars.serviceName +
             this.sessionVars.tokenName +
             "=" +
@@ -134,10 +132,10 @@ export default {
 }
 @keyframes fileAppears {
   form {
-    margin-top:-2em;
+    margin-top: -2em;
   }
   to {
-      margin-top:0em;
+    margin-top: 0em;
   }
 }
 div#fileUpload {
@@ -170,7 +168,6 @@ div#fileUpload > div.panelDown {
   position: relative;
   overflow: hidden;
 }
-
 
 div#fileUpload > div.panelDown > div.file.upped {
   margin-right: -18em;
@@ -223,7 +220,6 @@ div#fileUpload > div.panelDown > div.file > div.fileTitle {
 }
 
 div#fileUpload > div.panelDown.down {
-  
 }
 div#fileUpload > div.submitFile {
   display: inline-block;
@@ -246,9 +242,9 @@ div#fileUpload > div.panelDown > div.file {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: 2em;
-  animation: 0.25s 0.25s fileAppears both ;
- 
-  margin-top:-2em;
+  animation: 0.25s 0.25s fileAppears both;
+
+  margin-top: -2em;
   opacity: 1;
   z-index: -1;
 }

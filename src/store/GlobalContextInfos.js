@@ -3,7 +3,7 @@ const sessionVars = {
   tokenName: null,
   tokenValue: null,
   servicePath:
-    "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/",
+    "services/",
   serviceName: "",
   rootPage: 1,
   pagesNumber: 0,

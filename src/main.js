@@ -60,13 +60,11 @@ Vue.use(VueScrollTo, {
 
 Vue.prototype.sessionVars = sessionVars;
 Vue.config.productionTip = false;
+Vue.config.devtools = true
 
 /* eslint-disable no-new */
 new Vue({
-  el: "#app",
   router,
-  components: {
-    App
-  },
-  template: "<App/>"
-});
+  render: h => h(App)
+}).$mount("#app");
+

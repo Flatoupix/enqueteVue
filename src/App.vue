@@ -1,47 +1,51 @@
 <template>
   <div id="app">
-    <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @refresh="refreshPage" />
+    <div v-if="loaded ">
+      <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="rootPage" @refresh="refreshPage" />
 
-    <div v-show="sessionVars.rootPage==1" class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
+      <div v-show="sessionVars.rootPage==1 && extObj.pic!=null" class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
 
-    </div>
-    <h1 v-show=" sessionVars.rootPage==1">{{extObj.title}}</h1>
-    <h2 v-show="isOpen&& sessionVars.rootPage==1">{{extObj.subTitle}}</h2>
-    <h2 v-show="!isOpen">{{extObj.closureMsg}}</h2>
+      </div>
+      <h1 v-show="sessionVars.rootPage==1">{{extObj.title}}</h1>
+      <h2 v-show="isOpen&& sessionVars.rootPage==1">{{extObj.subTitle}}</h2>
+      <h2 v-show="!isOpen">{{extObj.closureMsg}}</h2>
 
-    <p v-show="!isConfirmed && isOpen && sessionVars.rootPage==1">{{extObj.description}}</p>
-    <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
+      <p v-show="!isConfirmed && isOpen && sessionVars.rootPage==1">{{extObj.description}}</p>
+      <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
 
-    <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
-      <div class="themeTitle">{{ page.questions[0].theme }}</div>
+      <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+        <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
-      <QuestionHolder :id="questions.id" :question="questions" v-for="questions in
+        <QuestionHolder :id="questions.id" :question="questions" v-for="questions in
         page.questions" v-show="!questions.isHiding ||
       show.includes(questions.id)" :key="questions.id">
 
-        <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
-        <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
+          <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
+          <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
 
-        <Range type="range" @responseInput="postResponse($event)"
-        v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage" :question="questions" />
+          <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage" :question="questions" />
 
-        <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
-        <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
+          <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
+          <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
 
-        <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
+          <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
         questions.type=='MEMO'" v-model="input" :question="questions" />
 
-        <typeSignature  v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage"
-        @responseInput="postCapture($event)"   :question="questions" />
+          <typeSignature v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage" @responseInput="postCapture($event)" :question="questions" />
 
-       
-      </QuestionHolder>
+          <typeFile v-if="questions.type=='FILE'" @responseInput="postFile($event)" :question="questions" />
 
-    </PageHolder>
-    <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" /> 
-    <typeFile  @responseInput="postFile($event)"  />
-    <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @refresh="refreshPage" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
-    <div class="pwrBy">Powered by Eudonet</div>
+        </QuestionHolder>
+
+      </PageHolder>
+      <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" />
+      <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @refresh="refreshPage" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
+      <div class="pwrBy">Powered by Eudonet</div>
+    </div>
+    <div class="loadContainer" v-if="!loaded">
+      <div class="loading"></div>
+
+    </div>
   </div>
 
 </template>
@@ -101,7 +105,8 @@ export default {
       isConfirmed: false,
       isOpen: true,
 
-      debugMode: true
+      loaded: false,
+      debugMode: false
     };
   },
   methods: {
@@ -132,7 +137,7 @@ export default {
       let buffer = [];
       this.pagesNumber = 0;
 
-      if (this.isDisplay == undefined) {
+      if (this.ifDisplay.length == 0) {
         this.extObj.pages.forEach(page => {
           this.pagesNumber++;
           // Parcours des questions
@@ -161,7 +166,10 @@ export default {
           // Filtrage
           let scan = [];
           if (question.response != null) {
-            if (question.type.includes("LISTE")) {
+            if (
+              question.type.includes("LISTE") ||
+              question.type.includes("BOOL")
+            ) {
               scan = [question.response.value];
             }
             if (
@@ -211,9 +219,7 @@ export default {
 
       this.$http
         .post(
-          sessionVars.urlLocation +
-            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
-            "confirm?" +
+          "services/confirm?" +
             sessionVars.tokenName +
             "=" +
             encodeURIComponent(sessionVars.tokenValue),
@@ -238,8 +244,7 @@ export default {
       }
       this.$http
         .post(
-          sessionVars.urlLocation +
-            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+          "services/" +
             serviceLink +
             sessionVars.tokenName +
             "=" +
@@ -274,8 +279,7 @@ export default {
       this.objFormat = response;
       this.$http
         .post(
-          sessionVars.urlLocation +
-            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+          "services/" +
             serviceLink +
             sessionVars.tokenName +
             "=" +
@@ -292,8 +296,7 @@ export default {
       this.objFormat = response;
       this.$http
         .post(
-          sessionVars.urlLocation +
-            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/" +
+          "services/" +
             serviceLink +
             sessionVars.tokenName +
             "=" +
@@ -337,7 +340,7 @@ export default {
   },
   mounted() {
     if (this.debugMode) {
-      sessionVars.urlLocation = "http://nla2-pc.levallois.eudoweb.com";
+      sessionVars.urlLocation = "http://pno-pc.levallois.eudoweb.com";
     } else {
       sessionVars.urlLocation = window.location.origin;
     }
@@ -362,16 +365,14 @@ export default {
 
     this.$http
       .get(
-        sessionVars.urlLocation +
-          "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+        "services/survey?" +
           sessionVars.tokenName +
           "=" +
           encodeURIComponent(sessionVars.tokenValue)
       )
       .then(
         console.log(
-          sessionVars.urlLocation +
-            "/specif/EUDO_EXTENSION_ENQUETE/root/SectionORM/modules/enquete/services/survey?" +
+          "services/survey?" +
             sessionVars.tokenName +
             "=" +
             encodeURIComponent(sessionVars.tokenValue)
@@ -401,7 +402,7 @@ export default {
         console.log(error);
         this.errored = true;
       })
-      .finally(() => (this.loading = false));
+      .finally(() => (this.loaded = true));
   }
 };
 </script>
@@ -589,5 +590,35 @@ div.bannerImg {
   visibility: visible;
   opacity: 1;
   transition: opacity 0.15s;
+}
+
+@keyframes loadLoop {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.loadContainer {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  left: 0;
+}
+.loading {
+  width: 10em;
+  height: 10em;
+  border-radius: 10em;
+  border-top-style: dashed;
+  border-right-style: dashed;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-color: #bb1515;
+  border-width: 8pt;
+  -webkit-animation: loadLoop infinite 1s;
+  animation: loadLoop infinite 1s ease-in-out;
+  margin: 40vh auto;
 }
 </style>
