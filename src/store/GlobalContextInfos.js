@@ -2,8 +2,7 @@ const sessionVars = {
   urlLocation: window.location.origin,
   tokenName: null,
   tokenValue: null,
-  servicePath:
-    "services/",
+  servicePath: "services/",
   serviceName: "",
   rootPage: 1,
   pagesNumber: 0,

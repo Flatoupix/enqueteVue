@@ -1,7 +1,8 @@
 <template>
   <div>
 
-    <vue-slider :tooltip="'hover'" :tooltipStyle="{backgroundColor:'#bb1515',borderColor: '#bb1515'}" :processStyle="{backgroundColor:'#bb1515'}" :step="question.step" :max="question.max" :min="question.min" @mouseup.native="select(inputRange,question.id)" v-model="inputRange" :piecewiseLabel="true">
+    <vue-slider :tooltip="'hover'" ref="slider" :lazy="true" :tooltipStyle="{backgroundColor:'#bb1515',borderColor: '#bb1515'}" :processStyle="{backgroundColor:'#bb1515'}" :step="question.step" :max="question.max" :min="question.min"
+     @callback="select()" v-model="inputRange" :piecewiseLabel="true">
     </vue-slider>
 
   </div>
@@ -24,17 +25,17 @@ export default {
     if (this.question.response != null) {
       this.savedChoice = parseInt(this.question.response.value);
     } else {
-      // this.savedChoice = parseInt(this.question.min);
+      this.savedChoice = parseInt(this.question.min);
     }
     return {
       inputRange: this.savedChoice
     };
   },
   methods: {
-    select(response, id) {
-      this.$emit("responseInput", {
-        idQuestion: id,
-        value: response
+    select() {
+     this.$emit("responseInput", {
+        idQuestion: this.question.id,
+        value: this.inputRange
       });
     }
   }

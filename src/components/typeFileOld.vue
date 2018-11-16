@@ -4,23 +4,19 @@
       <div>Ajoutez votre fichier ici</div>
       <input type="file" id="attachment" ref="fileattachment" multiple @change="handleFileUpload()" />
     </label>
+    <div :class="['submitFile',files.length!=0 ?
+    'attached':'']" @click="submitFile()">Envoyer</div>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
-      <div class="fileParent" :key="index" v-for="(file, index) in files">
-        <div :class="['file',uppedFiles.includes(file.name)?'upped':'']">
-          <div class="msgUpd"><span class="fileName">{{file.name}}</span></div>
-          <div class="fileTitle">{{file.name}}</div>
-        </div>
-        <div :class="['submitGrid',uppedFiles.includes(file.name)?'sent':'']">
-          <div class='submitFile' @click="submitFile(file.name)">Envoyer</div>
-          <div class="fileActions">
-            <div class="fileSent"> Envoyé !</div>
-            <div class="deleteFile" @click="deleteFile(index,file.name)">Supprimer</div>
 
-          </div>
+      <div :class="['file',uppedFiles.includes(file.lastModified)?'upped':'']" :key="index" v-for="(file, index) in files">
+        <div class="msgUpd"><span class="fileName">{{file.name}}</span> <span v-if="uppedFiles.includes(file.lastModified)"> envoyé !</span>
+          <div class="closeBtn" @click="deleteFile(index)">+</div>
         </div>
+        <div class="fileTitle">{{file.name}}<div class="closeBtn" @click="deleteFile(index)">+</div>
+        </div>
+
       </div>
-
     </div>
 
   </div>
@@ -48,21 +44,14 @@ export default {
     };
   },
   methods: {
-    deleteFileArr(array, file) {
-      array.splice(array.indexOf(file), 1);
-    },
-    submitFile(fileUpped) {
+    submitFile() {
       let formData = new FormData();
       this.sessionVars.serviceName = "attachment?";
-
-      this.uppedFiles.push(fileUpped);
-
       for (const file of this.files) {
-        if (fileUpped == file.name) {
-          formData.append("FileUpload", file);
-        }
+        formData.append("FileUpload", file);
+        this.uppedFiles.push(file.lastModified);
+        console.log(this.uppedFiles);
       }
-
       formData.append("Quest", this.question.id);
       this.$http
         .post(
@@ -71,12 +60,7 @@ export default {
             this.sessionVars.tokenName +
             "=" +
             encodeURIComponent(this.sessionVars.tokenValue),
-          formData,
-          {
-            onUploadProgress(progress) {
-              console.log(progress);
-            }
-          }
+          formData
         )
         .then(resp => {
           this.fileIDs.push(resp.data.reponse.CurrentIdAnnexe);
@@ -89,10 +73,12 @@ export default {
           console.log("FAILURE!!");
         });
     },
-    deleteFile(index, fileTarget) {
+    deleteFile(index) {
       this.sessionVars.serviceName = "deleteattachment?";
+
       let objFormat = {
         name: "FileDelete",
+        // id: this.question.id,
         uidFile: this.fileIDs[index],
         extension: ""
       };
@@ -104,29 +90,22 @@ export default {
             this.sessionVars.tokenName +
             "=" +
             encodeURIComponent(this.sessionVars.tokenValue),
-          JSON.stringify(objFormat),
-          {
-            onUploadProgress(progress) {
-              console.log(progress);
-            }
-          }
+          JSON.stringify(objFormat)
         )
         .then(resp => {
           console.log(objFormat);
           console.log(resp);
           console.log("DELETE SUCCESS!!");
-
-          this.deleteFileArr(this.uppedFiles, fileTarget);
-          this.deleteFileArr(this.files, fileTarget);
-          this.deleteFileArr(this.fileIDs, fileTarget);
-          // this.files.splice(index, 1);
-          // this.fileIDs.splice(index, 1);
-          // this.uppedFiles.splice(this.uppedFiles.indexOf(fileTarget), 1);
-
-          console.log(this.uppedFiles);
+          this.files.splice(index, 1);
+          this.fileIDs.splice(index, 1);
         })
         .catch(function() {
           console.log("FAILURE DELETE!!");
+
+          // A SUPPRIMER --
+
+          this.files.splice(index, 1);
+          this.fileIDs.splice(index, 1);
         });
     },
 
@@ -140,19 +119,10 @@ export default {
         console.log(this.uppedFiles);
       }
     }
-  },
-  mounted() {
-    console.log("mounted !");
-    this.question.response.value.forEach(item => {
-      this.files.push(item);
-      this.uppedFiles.push(item.name);
-    });
   }
 };
 </script>
-<style>
-/* #158D2A le vert de couleur verte */
-
+<style scoped>
 @keyframes submitOn {
   from {
     opacity: 0;
@@ -163,14 +133,6 @@ export default {
     margin-right: 0;
   }
 }
-@-webkit-keyframes fileAppears {
-  form {
-    margin-top: -2em;
-  }
-  to {
-    margin-top: 0em;
-  }
-}
 @keyframes fileAppears {
   form {
     margin-top: -2em;
@@ -179,28 +141,13 @@ export default {
     margin-top: 0em;
   }
 }
-@keyframes deleteTime {
-  from {
-    margin-top: -2em;
-  }
-  to {
-    margin-top: -3em;
-  }
-}
-.fileName,
-.fileTitle {
+.fileName {
   text-overflow: ellipsis;
   overflow-x: hidden;
-  max-width: 15em;
+  max-width: 10em;
   display: inline-block;
-  text-indent: 0.5em;
 }
-#fileUpload
-  > div.panelDown.down
-  > div.fileParent
-  > div.file
-  > div.msgUpd
-  > span:nth-child(2) {
+#fileUpload > div.panelDown.down > div > div.msgUpd > span:nth-child(2) {
   display: inline-block;
   vertical-align: top;
   text-indent: 0.4em;
@@ -209,9 +156,6 @@ div#fileUpload {
   margin: auto;
   width: 35rem;
   display: inline-block;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 div#fileUpload label.headLabel {
@@ -231,32 +175,26 @@ div#fileUpload label.headLabel > div {
 }
 div#fileUpload > div.panelDown {
   background-color: #e8e8e8;
-  width: 20em;
+  width: 50%;
   margin: 0 auto;
   color: #8b8b8b;
   z-index: 1;
   position: relative;
   overflow: hidden;
 }
-div#fileUpload > div.panelDown > div.fileParent > div.file.upped {
-  margin-left: 0em;
+
+div#fileUpload > div.panelDown > div.file.upped {
+  margin-right: -18em;
+  margin-left: 0;
 }
-div.fileActions {
+div#fileUpload > div.panelDown > div.file:hover div > div.closeBtn {
+  display: inline-block;
+  opacity: 1;
 }
-div.fileSent {
-  background-color: #636363;
-  color: white;
-}
-div.deleteFile {
-  background-color: black;
-  color: #ccc;
-  line-height: 1.4em;
-  font-size: 0.7em;
-}
-div#fileUpload > div.panelDown > div.fileParent > div.file > div {
+div#fileUpload > div.panelDown > div.file > div {
   position: relative;
 }
-div#fileUpload > div.panelDown > div.fileParent > div.file div > div.closeBtn {
+div#fileUpload > div.panelDown > div.file div > div.closeBtn {
   background-color: #333;
   border-radius: 1em;
   color: white;
@@ -269,7 +207,6 @@ div#fileUpload > div.panelDown > div.fileParent > div.file div > div.closeBtn {
   opacity: 0;
   display: inline-block;
   cursor: pointer;
-  -webkit-transition: 0.5s;
   transition: 0.5s;
   position: absolute;
   right: 0.5em;
@@ -284,11 +221,12 @@ div#fileUpload > div.panelDown > div.file > div.fileTitle {
   overflow: hidden;
   text-indent: 0.8em;
 }
-#fileUpload > div.panelDown.down > div.fileParent > div.file > * {
+#fileUpload > div.panelDown.down > div.file > * {
   height: 2em;
   line-height: 2em;
 }
-#fileUpload > div.panelDown.down > div.fileParent > div.file > div.msgUpd {
+
+#fileUpload > div.panelDown.down > div.file > div.msgUpd {
   height: 1.9em;
   line-height: 2em;
   color: #bb1515;
@@ -296,44 +234,42 @@ div#fileUpload > div.panelDown > div.file > div.fileTitle {
   border-bottom: 1px solid #bb1515;
   max-width: 18em;
 }
-div.submitGrid {
-  display: grid;
-  grid-template-rows: 2em 2em;
-  transition: 0.25s;
-  cursor: pointer;
+
+div#fileUpload > div.panelDown.down {
 }
-div.submitGrid.sent {
-  margin-top: -2em;
-}
-div.submitGrid.sent:hover {
-  animation: deleteTime 0.25s 0.25s both;
-}
-div.submitFile {
+div#fileUpload > div.submitFile {
+  display: inline-block;
   background-color: #bb1515;
   color: white;
+  width: 20%;
+  line-height: 3rem;
   cursor: pointer;
+  z-index: 100;
+  position: relative;
+  display: none;
+  margin-left: -0.2em;
+  opacity: 0;
 }
-
-#fileUpload > div.panelDown > div.fileParent {
-  display: grid;
-  grid-template-columns: 15em 5em;
-  height: 2em;
-  margin-top: -2em;
-  line-height: 2em;
-  animation: 0.5s fileAppears forwards;
-  overflow: hidden;
-}
-div#fileUpload > div.panelDown > div.fileParent > div.file {
+div#fileUpload > div.panelDown > div.file {
   background-color: #d7d7d7;
+  -webkit-transition: 0.5s;
   white-space: nowrap;
+  margin-left: -18em;
   display: grid;
-  margin-left: -15em;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 2em;
+  animation: 0.25s 0.25s fileAppears both;
+
+  margin-top: -2em;
   opacity: 1;
   z-index: -1;
-  grid-template-columns: 15em 15em;
-  transition: all 0.25s;
 }
-
+div#fileUpload > div.submitFile.attached {
+  animation-fill-mode: forwards;
+  animation: 0.25s submitOn;
+  display: inline-block;
+  opacity: 1;
+}
 div#fileUpload > label > input#attachment {
   display: none;
 }

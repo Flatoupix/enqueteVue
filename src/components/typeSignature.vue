@@ -15,7 +15,7 @@ export default {
       type: Object,
       default: () => {}
     },
-    pageNumber: {
+    pagesNumber: {
       type: Number,
       default: () => 0
     }

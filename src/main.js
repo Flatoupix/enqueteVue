@@ -8,10 +8,7 @@ import axios from "axios";
 import VueScrollTo from "vue-scrollto";
 import VTooltip from "v-tooltip";
 
-
 Vue.prototype.$http = axios;
-
-
 Vue.use(VTooltip, {
   // Default tooltip placement relative to target element
   defaultPlacement: "top",
@@ -60,11 +57,10 @@ Vue.use(VueScrollTo, {
 
 Vue.prototype.sessionVars = sessionVars;
 Vue.config.productionTip = false;
-Vue.config.devtools = true
+Vue.config.devtools = true;
 
 /* eslint-disable no-new */
 new Vue({
   router,
   render: h => h(App)
 }).$mount("#app");
-
