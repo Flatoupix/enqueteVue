@@ -1,8 +1,9 @@
 <template>
   <div id="fileUpload">
-    <label class="headLabel">
-      <div>Ajoutez votre fichier ici</div>
-      <input type="file" id="attachment" ref="fileattachment" multiple @change="handleFileUpload()" />
+    <label :class="['headLabel',files.length>=1 ? 'loaded':'']">
+      <div v-if="files.length>=1">Fichier chargé</div>
+      <div v-else>Ajoutez votre fichier ici</div>
+      <input type="file" id="attachment" ref="fileattachment" :disabled="files.length>=1" @change="handleFileUpload()" />
     </label>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
@@ -12,7 +13,10 @@
           <div class="fileTitle">{{file.name}}</div>
         </div>
         <div :class="['submitGrid',uppedFiles.includes(file.name)?'sent':'']">
-          <div class='submitFile' @click="submitFile(file.name)">Envoyer</div>
+          <div class='submitFile'>
+            <div @click="submitFile(file.name)">Envoyer</div>
+            <div @click="deleteFile(index,file.name)" class="deleteFile">Annuler</div>
+          </div>
           <div class="fileActions">
             <div class="fileSent"> Envoyé !</div>
             <div class="deleteFile" @click="deleteFile(index,file.name)">Supprimer</div>
@@ -143,10 +147,12 @@ export default {
   },
   mounted() {
     console.log("mounted !");
-    this.question.response.value.forEach(item => {
-      this.files.push(item);
-      this.uppedFiles.push(item.name);
-    });
+    if (this.question.response != null) {
+      this.question.response.value.forEach(item => {
+        this.files.push(item);
+        this.uppedFiles.push(item.name);
+      });
+    }
   }
 };
 </script>
@@ -179,14 +185,7 @@ export default {
     margin-top: 0em;
   }
 }
-@keyframes deleteTime {
-  from {
-    margin-top: -2em;
-  }
-  to {
-    margin-top: -3em;
-  }
-}
+
 .fileName,
 .fileTitle {
   text-overflow: ellipsis;
@@ -221,6 +220,9 @@ div#fileUpload label.headLabel {
   position: relative;
   background-color: #efefef;
   z-index: 100;
+  transition: all 0.5s;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 div#fileUpload label.headLabel > div {
   cursor: pointer;
@@ -228,6 +230,23 @@ div#fileUpload label.headLabel > div {
   color: #717171;
   width: 69%;
   line-height: 3rem;
+}
+div#fileUpload label.headLabel.loaded {
+  width: 25%;
+  display: inline-block;
+  height: 2rem;
+  position: relative;
+  background-color: #bb1515;
+  margin-bottom: 1em;
+  border-radius: 0.5em;
+  border: 0.1em #d20000 solid;
+}
+div#fileUpload label.headLabel.loaded > div {
+  cursor: pointer;
+  display: inline-block;
+  color: white;
+  width: 69%;
+  line-height: 2rem;
 }
 div#fileUpload > div.panelDown {
   background-color: #e8e8e8;
@@ -240,8 +259,6 @@ div#fileUpload > div.panelDown {
 }
 div#fileUpload > div.panelDown > div.fileParent > div.file.upped {
   margin-left: 0em;
-}
-div.fileActions {
 }
 div.fileSent {
   background-color: #636363;
@@ -299,19 +316,23 @@ div#fileUpload > div.panelDown > div.file > div.fileTitle {
 div.submitGrid {
   display: grid;
   grid-template-rows: 2em 2em;
-  transition: 0.25s;
+  transition: 0.5s;
   cursor: pointer;
 }
 div.submitGrid.sent {
   margin-top: -2em;
 }
 div.submitGrid.sent:hover {
-  animation: deleteTime 0.25s 0.25s both;
+  margin-top: -2.9em;
 }
 div.submitFile {
   background-color: #bb1515;
   color: white;
   cursor: pointer;
+  transition: 0.5s all;
+}
+div.submitFile:hover {
+  margin-top: -0.9em;
 }
 
 #fileUpload > div.panelDown > div.fileParent {
