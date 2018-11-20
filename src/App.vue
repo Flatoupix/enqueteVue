@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @click.ctrl="darkTime()">
     <div class="badToken" v-if="errored">
       <h2>Le token n'est pas bon...</h2>
     </div>
@@ -342,6 +342,9 @@ export default {
       if (!noReload) {
         // sessionVars.pageRefresh = true
       }
+    },
+    darkTime() {
+      window.document.body.style.backgroundColor = "#1b1b1b";
     }
   },
   mounted() {
@@ -403,6 +406,8 @@ export default {
         this.errored = true;
       })
       .finally(() => (this.loaded = true));
+    if (this.darkTime) {
+    }
   }
 };
 </script>

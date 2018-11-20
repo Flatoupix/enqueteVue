@@ -7,6 +7,15 @@ import sessionVars from "./store/GlobalContextInfos";
 import axios from "axios";
 import VueScrollTo from "vue-scrollto";
 import VTooltip from "v-tooltip";
+import VueMq from "vue-mq";
+
+Vue.use(VueMq, {
+  breakpoints: {
+    sm: 450,
+    md: 1250,
+    lg: Infinity
+  }
+});
 
 Vue.prototype.$http = axios;
 Vue.use(VTooltip, {

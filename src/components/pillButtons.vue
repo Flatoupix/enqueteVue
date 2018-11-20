@@ -1,6 +1,6 @@
 
 <template>
-  <div  class="buttonsHolder">
+  <div class="buttonsHolder">
     <select v-tooltip="question.toolTip" @change="select(myValue)" v-if="question.responseChoices.length > 6" v-model="myValue" :id="question.id">
       <option :key="response.id" v-for="response
         in question.responseChoices" :responseValue="response" :value="response">{{response.value}}</option>
