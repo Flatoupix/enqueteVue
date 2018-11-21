@@ -1,9 +1,10 @@
 <template>
   <div id="fileUpload">
     <label :class="['headLabel',files.length>=1 ? 'loaded':'']">
-      <div v-if="files.length>=1">Fichier chargé</div>
+      <div v-if="files.length==1"> {{files.length}} fichier chargé</div>
+      <div v-if="files.length>=2"> {{files.length}} fichiers chargés</div>
       <div v-else>Ajoutez votre fichier ici</div>
-      <input type="file" id="attachment" ref="fileattachment" :disabled="files.length>=1" @change="handleFileUpload()" />
+      <input type="file" id="attachment" ref="fileattachment" multiple @change="handleFileUpload()" />
     </label>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
@@ -53,7 +54,28 @@ export default {
   },
   methods: {
     deleteFileArr(array, file) {
-      array.splice(array.indexOf(file), 1);
+      if (array.length != 0) {
+        array.forEach(fileType => {
+          if (typeof fileType == "string") {
+            if (fileType == file) {
+              let cocote = array.indexOf(file);
+              if (cocote != -1) array.splice(cocote, 1);
+            }
+          } else {
+            if (fileType.name == file) {
+              let cocote = array.indexOf(fileType);
+              if (cocote != -1) array.splice(cocote, 1);
+            }
+          }
+
+          //if (fileType.size == undefined) {
+          //if (fileType.name != undefined) {
+
+          //} else {
+          //array.splice(array.indexOf(file), 1);
+          //}
+        });
+      }
     },
     submitFile(fileUpped) {
       let formData = new FormData();
@@ -214,7 +236,7 @@ div#fileUpload {
   user-select: none;
 }
 div#fileUpload label.headLabel {
-  width: 40%;
+  width: 50%;
   display: inline-block;
   height: 3rem;
   position: relative;
@@ -232,11 +254,11 @@ div#fileUpload label.headLabel > div {
   line-height: 3rem;
 }
 div#fileUpload label.headLabel.loaded {
-  width: 25%;
+  width: 35%;
   display: inline-block;
   height: 2rem;
   position: relative;
-  background-color: #bb1515;
+  background-color: white;
   margin-bottom: 1em;
   border-radius: 0.5em;
   border: 0.1em #d20000 solid;
@@ -244,7 +266,7 @@ div#fileUpload label.headLabel.loaded {
 div#fileUpload label.headLabel.loaded > div {
   cursor: pointer;
   display: inline-block;
-  color: white;
+  color: #bb1515;
   width: 69%;
   line-height: 2rem;
 }
