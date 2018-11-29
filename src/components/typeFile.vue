@@ -4,11 +4,21 @@
       <div v-if="files.length==1"> {{files.length}} fichier chargé</div>
       <div v-if="files.length>=2"> {{files.length}} fichiers chargés</div>
       <div v-else>Ajoutez votre fichier ici</div>
-      <input type="file" id="attachment" ref="fileattachment" multiple @change="handleFileUpload()" />
+      <input
+        type="file"
+        id="attachment"
+        ref="fileattachment"
+        multiple
+        @change="handleFileUpload()"
+      />
     </label>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
-      <div class="fileParent" :key="index" v-for="(file, index) in files">
+      <div
+        class="fileParent"
+        :key="index"
+        v-for="(file, index) in files"
+      >
         <div :class="['file',uppedFiles.includes(file.name)?'upped':'']">
           <div class="msgUpd"><span class="fileName">{{file.name}}</span></div>
           <div class="fileTitle">{{file.name}}</div>
@@ -16,12 +26,17 @@
         <div :class="['submitGrid',uppedFiles.includes(file.name)?'sent':'']">
           <div class='submitFile'>
             <div @click="submitFile(file.name)">Envoyer</div>
-            <div @click="deleteFile(index,file.name)" class="deleteFile">Annuler</div>
+            <div
+              @click="deleteFile(index,file.name)"
+              class="deleteFile"
+            >Annuler</div>
           </div>
           <div class="fileActions">
             <div class="fileSent"> Envoyé !</div>
-            <div class="deleteFile" @click="deleteFile(index,file.name)">Supprimer</div>
-
+            <div
+              class="deleteFile"
+              @click="deleteFile(index,file.name)"
+            >Supprimer</div>
           </div>
         </div>
       </div>
@@ -99,8 +114,9 @@ export default {
             encodeURIComponent(this.sessionVars.tokenValue),
           formData,
           {
-            onUploadProgress(progress) {
-              console.log(progress);
+            onUploadProgress(e) {
+              let percent = parseInt(100 - (e.loaded / e.total) * 100);
+              console.log(percent);
             }
           }
         )
@@ -130,15 +146,10 @@ export default {
             this.sessionVars.tokenName +
             "=" +
             encodeURIComponent(this.sessionVars.tokenValue),
-          JSON.stringify(objFormat),
-          {
-            onUploadProgress(progress) {
-              console.log(progress);
-            }
-          }
+          objFormat
         )
         .then(resp => {
-          console.log(objFormat);
+          console.log("Obj = " + objFormat);
           console.log(resp);
           console.log("DELETE SUCCESS!!");
 
@@ -149,7 +160,7 @@ export default {
           // this.fileIDs.splice(index, 1);
           // this.uppedFiles.splice(this.uppedFiles.indexOf(fileTarget), 1);
 
-          console.log(this.uppedFiles);
+          console.log("UppedFiles = " + this.uppedFiles);
         })
         .catch(function() {
           console.log("FAILURE DELETE!!");

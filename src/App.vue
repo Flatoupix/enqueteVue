@@ -1,12 +1,29 @@
 <template>
-  <div id="app" @click.ctrl="darkTime()">
-    <div class="badToken" v-if="errored">
+  <div
+    id="app"
+    @click.ctrl="darkTime()"
+  >
+    <div
+      class="badToken"
+      v-if="errored"
+    >
       <h2>Le token n'est pas bon...</h2>
     </div>
     <div v-if="loaded&&!errored">
-      <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages" :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()" v-model="sessionVars.rootPage" @refresh="refreshPage" />
+      <PageButtons
+        v-show="!isConfirmed && isOpen"
+        :page="extObj.pages"
+        :rootPage="parseInt($route.params.rootPage)"
+        @scan="checkForm()"
+        v-model="sessionVars.rootPage"
+        @refresh="refreshPage"
+      />
 
-      <div v-show="sessionVars.rootPage==1 && extObj.pic!=null" class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }">
+      <div
+        v-show="sessionVars.rootPage==1 && extObj.pic!=null"
+        class="bannerImg"
+        :style="{ backgroundImage: 'url(' + extObj.pic + ')' }"
+      >
 
       </div>
       <h1 v-show="sessionVars.rootPage==1">{{extObj.title}}</h1>
@@ -16,36 +33,97 @@
       <p v-show="!isConfirmed && isOpen && sessionVars.rootPage==1">{{extObj.description}}</p>
       <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
 
-      <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen" :page="page" :key="page.number" :id="page.number" v-for="page in extObj.pages">
+      <PageHolder
+        v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen"
+        :page="page"
+        :key="page.number"
+        :id="page.number"
+        v-for="page in extObj.pages"
+      >
         <div class="themeTitle">{{ page.questions[0].theme }}</div>
 
-        <QuestionHolder :id="questions.id" :question="questions" v-for="questions in
-        page.questions" v-show="!questions.isHiding ||
-      show.includes(questions.id)" :key="questions.id">
+        <QuestionHolder
+          :id="questions.id"
+          :question="questions"
+          v-for="questions in
+        page.questions"
+          v-show="!questions.isHiding ||
+      show.includes(questions.id)"
+          :key="questions.id"
+        >
 
-          <PillButtons @responseInput="postResponse($event)" v-if="(questions.type=='LISTE' || questions.type=='BOOL')" :question="questions" />
-          <VueStars @responseInput="postResponse($event)" v-if="questions.type=='STARS'" :question="questions"></VueStars>
+          <PillButtons
+            @responseInput="postResponse($event)"
+            v-if="(questions.type=='LISTE' || questions.type=='BOOL')"
+            :question="questions"
+          />
+          <VueStars
+            @responseInput="postResponse($event)"
+            v-if="questions.type=='STARS'"
+            :question="questions"
+          ></VueStars>
 
-          <Range type="range" @responseInput="postResponse($event)" v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage" :question="questions" />
+          <Range
+            type="range"
+            @responseInput="postResponse($event)"
+            v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage"
+            :question="questions"
+          />
 
-          <CheckBoxes @responseInput="postResponse($event)" v-if="questions.type=='MULTI' || questions.type=='SIMPLE' " :question="questions" />
-          <DatePicker @responseInput="postResponse($event)" :question="questions" v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')" />
+          <CheckBoxes
+            @responseInput="postResponse($event)"
+            v-if="questions.type=='MULTI' || questions.type=='SIMPLE' "
+            :question="questions"
+          />
+          <DatePicker
+            @responseInput="postResponse($event)"
+            :question="questions"
+            v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"
+          />
 
-          <typeInput :tooltip="questions.toolTip" @responseInput="postResponse($event)" v-if="questions.type=='NUM' || questions.type=='TEXT' ||
-        questions.type=='MEMO'" v-model="input" :question="questions" />
+          <typeInput
+            :tooltip="questions.toolTip"
+            @responseInput="postResponse($event)"
+            v-if="questions.type=='NUM' || questions.type=='TEXT' ||
+        questions.type=='MEMO'"
+            v-model="input"
+            :question="questions"
+          />
 
-          <typeSignature v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage" @responseInput="postCapture($event)" :question="questions" />
+          <typeSignature
+            v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage"
+            @responseInput="postCapture($event)"
+            :question="questions"
+          />
 
-          <typeFile v-if="questions.type=='FILE'" @responseInput="postFile($event)" :question="questions" />
+          <typeFile
+            v-if="questions.type=='FILE'"
+            @responseInput="postFile($event)"
+            :question="questions"
+          />
 
         </QuestionHolder>
 
       </PageHolder>
-      <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" />
-      <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber" v-model="rootPage" :rootPage="parseInt(rootPage)" @refresh="refreshPage" @formConfirmed="finalPost()" @scan="checkForm()"></PageBrowser>
+      <PageHolder
+        v-show="isConfirmed "
+        :closeMsg="extObj.closureMsg"
+      />
+      <PageBrowser
+        v-show="!isConfirmed && isOpen"
+        :pagesNumber="pagesNumber"
+        v-model="rootPage"
+        :rootPage="parseInt(rootPage)"
+        @refresh="refreshPage"
+        @formConfirmed="finalPost()"
+        @scan="checkForm()"
+      ></PageBrowser>
       <div class="pwrBy">Powered by Eudonet</div>
     </div>
-    <div class="loadContainer" v-if="!loaded">
+    <div
+      class="loadContainer"
+      v-if="!loaded"
+    >
       <div class="loading"></div>
 
     </div>
