@@ -134,7 +134,8 @@ export default {
     deleteFile(index, fileTarget) {
       this.sessionVars.serviceName = "deleteattachment?";
       let objFormat = {
-        name: "FileDelete",
+        idQuestion: this.question.id,
+        name: fileTarget,
         uidFile: this.fileIDs[index],
         extension: ""
       };
@@ -149,17 +150,16 @@ export default {
           objFormat
         )
         .then(resp => {
-          console.log("Obj = " + objFormat);
-          console.log(resp);
-          console.log("DELETE SUCCESS!!");
-
           this.deleteFileArr(this.uppedFiles, fileTarget);
           this.deleteFileArr(this.files, fileTarget);
+
           this.deleteFileArr(this.fileIDs, fileTarget);
           // this.files.splice(index, 1);
           // this.fileIDs.splice(index, 1);
           // this.uppedFiles.splice(this.uppedFiles.indexOf(fileTarget), 1);
-
+          console.log("Obj = " + objFormat);
+          console.log(resp);
+          console.log("DELETE SUCCESS!!");
           console.log("UppedFiles = " + this.uppedFiles);
         })
         .catch(function() {
@@ -184,6 +184,7 @@ export default {
       this.question.response.value.forEach(item => {
         this.files.push(item);
         this.uppedFiles.push(item.name);
+        this.fileIDs.push(item.uidFile);
       });
     }
   }
