@@ -1,5 +1,9 @@
 <template>
   <div id="fileUpload">
+    <div
+      class="sizeWarnClass"
+      v-if="sizeWarning"
+    >Votre fichier dépasse la taille autorisée de 6 mégaoctets</div>
     <label :class="['headLabel',files.length>=1 ? 'loaded':'']">
       <div v-if="files.length==1"> {{files.length}} fichier chargé</div>
       <div v-if="files.length>=2"> {{files.length}} fichiers chargés</div>
@@ -19,10 +23,12 @@
         :key="index"
         v-for="(file, index) in files"
       >
+
         <div :class="['file',uppedFiles.includes(file.name)?'upped':'']">
           <div class="msgUpd"><span class="fileName">{{file.name}}</span></div>
           <div class="fileTitle">{{file.name}}</div>
         </div>
+
         <div :class="['submitGrid',uppedFiles.includes(file.name)?'sent':'']">
           <div class='submitFile'>
             <div @click="submitFile(file.name)">Envoyer</div>
@@ -56,6 +62,8 @@ export default {
   components: {},
   data() {
     return {
+      sizeWarning: false,
+      sizeLimit: 6000000,
       files: [],
       Url:
         this.sessionVars.servicePath +
@@ -172,10 +180,18 @@ export default {
       */
     handleFileUpload() {
       for (const file of this.$refs.fileattachment.files) {
-        this.files.push(file);
-
-        console.log(this.uppedFiles);
+        if (file.size <= this.sizeLimit) {
+          this.files.push(file);
+          console.log(this.uppedFiles);
+        } else {
+          this.sizeWarning = true;
+          console.log("bip");
+          setTimeout(this.warnOff, 5000);
+        }
       }
+    },
+    warnOff() {
+      this.sizeWarning = false;
     }
   },
   mounted() {
@@ -388,7 +404,12 @@ div#fileUpload > div.panelDown > div.fileParent > div.file {
   grid-template-columns: 15em 15em;
   transition: all 0.25s;
 }
-
+.sizeWarnClass {
+  margin: 1em;
+  color: #bb1515;
+  opacity: 1;
+  transition: 3s all;
+}
 div#fileUpload > label > input#attachment {
   display: none;
 }
