@@ -1,12 +1,19 @@
 <template>
-    <div class="questionsHolder">
-        <h3 v-if="sessionVars.errors.length >= 1" :class="[question.required ? 'required' : '']"> {{ question.question }}
-        </h3>
-        <h3 v-else> {{ question.question }} <span v-if="question.required" style="color:#bb1515">*</span></h3>
-        <slot></slot>
-    </div>
+  <div class="questionsHolder">
+    <div class="themeTitle" v-if="toto!=''" >{{ toto }}</div>
+    <h3
+      v-if="sessionVars.errors.length >= 1"
+      :class="[question.required ? 'required' : '']"
+    >
+      {{ question.question }}
+    </h3>
+    <h3 v-else>
+      {{ question.question }}
+      <span v-if="question.required" style="color:#bb1515">*</span>
+    </h3>
+    <slot></slot>
+  </div>
 </template>
-
 
 <script>
 export default {
@@ -14,7 +21,25 @@ export default {
     question: {
       type: Object,
       default: () => {}
+    },
+
+  },
+  computed:{
+    toto(){
+   
+    if (this.sessionVars.currentTheme != this.question.theme) {
+      
+      this.sessionVars.currentTheme = this.question.theme;
+        return this.sessionVars.currentTheme
     }
+    else
+       return ""
+    }
+  },
+  created() {
+   // console.log("question = " + this.question.theme);
+
+    
   }
 };
 </script>

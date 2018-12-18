@@ -1,9 +1,9 @@
 <template>
   <div id="fileUpload">
     <div
-      class="sizeWarnClass"
-      v-if="sizeWarning"
-    >Votre fichier dépasse la taille autorisée de 6 mégaoctets</div>
+      @mouseover="warnOff()"
+      :class="['sizeWarnClass', sizeWarning ? 'warnAppear':'']"
+    >Votre fichier dépasse la taille autorisée de 6 Mo</div>
     <label :class="['headLabel',files.length>=1 ? 'loaded':'']">
       <div v-if="files.length==1"> {{files.length}} fichier chargé</div>
       <div v-if="files.length>=2"> {{files.length}} fichiers chargés</div>
@@ -12,12 +12,15 @@
         type="file"
         id="attachment"
         ref="fileattachment"
-        multiple
         @change="handleFileUpload()"
       />
     </label>
     <div :class="['panelDown',files.length!=0 ?
     'down':'']">
+      <!-- <div
+        class=""
+        @click="sendAll(files)"
+      >Tout envoyer</div> -->
       <div
         class="fileParent"
         :key="index"
@@ -90,13 +93,6 @@ export default {
               if (cocote != -1) array.splice(cocote, 1);
             }
           }
-
-          //if (fileType.size == undefined) {
-          //if (fileType.name != undefined) {
-
-          //} else {
-          //array.splice(array.indexOf(file), 1);
-          //}
         });
       }
     },
@@ -138,6 +134,12 @@ export default {
         .catch(function() {
           console.log("FAILURE!!");
         });
+    },
+    sendAll(items) {
+      items.forEach(item => {
+        this.uppedFiles.push(item.name);
+        this.submitFile(item);
+      });
     },
     deleteFile(index, fileTarget) {
       this.sessionVars.serviceName = "deleteattachment?";
@@ -186,7 +188,6 @@ export default {
         } else {
           this.sizeWarning = true;
           console.log("bip");
-          setTimeout(this.warnOff, 5000);
         }
       }
     },
@@ -195,7 +196,7 @@ export default {
     }
   },
   mounted() {
-    console.log("mounted !");
+    
     if (this.question.response != null) {
       this.question.response.value.forEach(item => {
         this.files.push(item);
@@ -335,7 +336,6 @@ div#fileUpload > div.panelDown > div.fileParent > div.file div > div.closeBtn {
   font-family: serif;
   opacity: 0;
   display: inline-block;
-  cursor: pointer;
   -webkit-transition: 0.5s;
   transition: 0.5s;
   position: absolute;
@@ -407,8 +407,12 @@ div#fileUpload > div.panelDown > div.fileParent > div.file {
 .sizeWarnClass {
   margin: 1em;
   color: #bb1515;
+  opacity: 0;
+  transition: 0.25s;
+}
+.warnAppear {
   opacity: 1;
-  transition: 3s all;
+  animation: shake 0.5s;
 }
 div#fileUpload > label > input#attachment {
   display: none;

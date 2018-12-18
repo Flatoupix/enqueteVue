@@ -1,28 +1,15 @@
 <template>
-  <div
-    id="app"
-    @click.ctrl="darkTime()"
-  >
-    <div
-      class="badToken"
-      v-if="errored"
-    >
-      <h2>Le token n'est pas bon...</h2>
+  <div id="app" @click.ctrl="darkTime()" >
+    <div class="badToken" v-if="errored" >
+      <h2>Une erreur est survenue.</h2>
     </div>
     <div v-if="loaded&&!errored">
-      <PageButtons
-        v-show="!isConfirmed && isOpen"
-        :page="extObj.pages"
-        :rootPage="parseInt($route.params.rootPage)"
-        @scan="checkForm()"
-        v-model="sessionVars.rootPage"
-        @refresh="refreshPage"
-      />
+      <PageButtons v-show="!isConfirmed && isOpen" :page="extObj.pages"
+      :rootPage="parseInt($route.params.rootPage)" @scan="checkForm()"
+      v-model="sessionVars.rootPage" @refresh="refreshPage" />
 
-      <div
-        v-show="sessionVars.rootPage==1 && extObj.pic!=null"
-        class="bannerImg"
-        :style="{ backgroundImage: 'url(' + extObj.pic + ')' }"
+      <div v-show="sessionVars.rootPage==1 && extObj.pic!=null"
+      class="bannerImg" :style="{ backgroundImage: 'url(' + extObj.pic + ')' }"
       >
 
       </div>
@@ -30,100 +17,57 @@
       <h2 v-show="isOpen&& sessionVars.rootPage==1">{{extObj.subTitle}}</h2>
       <h2 v-show="!isOpen">{{extObj.closureMsg}}</h2>
 
-      <p v-show="!isConfirmed && isOpen && sessionVars.rootPage==1">{{extObj.description}}</p>
+      <p v-show="!isConfirmed && isOpen &&
+      sessionVars.rootPage==1">{{extObj.description}}</p>
       <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
 
-      <PageHolder
-        v-show="sessionVars.rootPage==page.number && !isConfirmed && isOpen"
-        :page="page"
-        :key="page.number"
-        :id="page.number"
-        v-for="page in extObj.pages"
-      >
-        <div class="themeTitle">{{ page.questions[0].theme }}</div>
+      <PageHolder v-show="sessionVars.rootPage==page.number && !isConfirmed &&
+      isOpen" :page="page" :key="page.number" :id="page.number" v-for="page in
+      extObj.pages" >
 
-        <QuestionHolder
-          :id="questions.id"
-          :question="questions"
-          v-for="questions in
-        page.questions"
-          v-show="!questions.isHiding ||
-      show.includes(questions.id)"
-          :key="questions.id"
-        >
+        <QuestionHolder :id="questions.id" :question="questions" 
+        v-for="questions in page.questions" v-show="!questions.isHiding ||
+        show.includes(questions.id)" :key="questions.id" >
 
-          <PillButtons
-            @responseInput="postResponse($event)"
-            v-if="(questions.type=='LISTE' || questions.type=='BOOL')"
-            :question="questions"
-          />
-          <VueStars
-            @responseInput="postResponse($event)"
-            v-if="questions.type=='STARS'"
-            :question="questions"
-          ></VueStars>
+          <PillButtons @responseInput="postResponse($event)"
+          v-if="(questions.type=='LISTE' || questions.type=='BOOL')"
+          :question="questions" />
+          <VueStars @responseInput="postResponse($event)"
+          v-if="questions.type=='STARS'" :question="questions" ></VueStars>
 
-          <Range
-            type="range"
-            @responseInput="postResponse($event)"
-            v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage"
-            :question="questions"
-          />
+          <Range type="range" @responseInput="postResponse($event)"
+          v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage"
+          :question="questions" />
 
-          <CheckBoxes
-            @responseInput="postResponse($event)"
-            v-if="questions.type=='MULTI' || questions.type=='SIMPLE' "
-            :question="questions"
-          />
-          <DatePicker
-            @responseInput="postResponse($event)"
-            :question="questions"
-            v-if="(questions.type=='DATE' || questions.type=='BIRTHDAY')"
-          />
+          <CheckBoxes @responseInput="postResponse($event)"
+          v-if="questions.type=='MULTI' || questions.type=='SIMPLE' "
+          :question="questions" />
+          <DatePicker @responseInput="postResponse($event)"
+          :question="questions" v-if="(questions.type=='DATE' ||
+          questions.type=='BIRTHDAY')" />
 
-          <typeInput
-            :tooltip="questions.toolTip"
-            @responseInput="postResponse($event)"
-            v-if="questions.type=='NUM' || questions.type=='TEXT' ||
-        questions.type=='MEMO'"
-            v-model="input"
-            :question="questions"
-          />
+          <typeInput :tooltip="questions.toolTip"
+          @responseInput="postResponse($event)" v-if="questions.type=='NUM' ||
+          questions.type=='TEXT' || questions.type=='MEMO'" v-model="input"
+          :question="questions" />
 
-          <typeSignature
-            v-if="questions.type=='CAPTURE' && page.number == sessionVars.rootPage"
-            @responseInput="postCapture($event)"
-            :question="questions"
-          />
+          <typeSignature v-if="questions.type=='CAPTURE' && page.number ==
+          sessionVars.rootPage" @responseInput="postCapture($event)"
+          :question="questions" />
 
-          <typeFile
-            v-if="questions.type=='FILE'"
-            @responseInput="postFile($event)"
-            :question="questions"
-          />
+          <typeFile v-if="questions.type=='FILE'"
+          @responseInput="postFile($event)" :question="questions" />
 
         </QuestionHolder>
 
       </PageHolder>
-      <PageHolder
-        v-show="isConfirmed "
-        :closeMsg="extObj.closureMsg"
-      />
-      <PageBrowser
-        v-show="!isConfirmed && isOpen"
-        :pagesNumber="pagesNumber"
-        v-model="rootPage"
-        :rootPage="parseInt(rootPage)"
-        @refresh="refreshPage"
-        @formConfirmed="finalPost()"
-        @scan="checkForm()"
-      ></PageBrowser>
+      <PageHolder v-show="isConfirmed " :closeMsg="extObj.closureMsg" />
+      <PageBrowser v-show="!isConfirmed && isOpen" :pagesNumber="pagesNumber"
+      v-model="rootPage" :rootPage="parseInt(rootPage)" @refresh="refreshPage"
+      @formConfirmed="finalPost()" @scan="checkForm()" ></PageBrowser>
       <div class="pwrBy">Powered by Eudonet</div>
     </div>
-    <div
-      class="loadContainer"
-      v-if="!loaded"
-    >
+    <div class="loadContainer" v-if="!loaded" >
       <div class="loading"></div>
 
     </div>
@@ -145,7 +89,7 @@ import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
 import typeFile from "./components/typeFile.vue";
 import datePickerVue from "./components/datePicker.vue";
-import sessionVars from "./store/GlobalContextInfos";
+ 
 
 export default {
   name: "App",
@@ -168,15 +112,13 @@ export default {
       input: null,
 
       dateInput: null,
-      storage: sessionVars,
-
       extObj: {},
       prevResponses: {},
 
       urlHeader: {},
       urlLocation: window.location.origin,
 
-      rootPage: sessionVars.rootPage,
+      rootPage: this.sessionVars.rootPage,
       pagesNumber: 0,
       modelPage: 1,
 
@@ -189,30 +131,31 @@ export default {
 
       loaded: false,
       errored: false,
-      debugVars: sessionVars,
-      debugMode: false
+      // debugVars: sessionVars,
+      debugMode: false,
+      darkMode: false
     };
   },
   methods: {
     checkForm() {
-      sessionVars.errors = [];
+      this.sessionVars.errors = [];
 
-      this.extObj.pages[sessionVars.rootPage - 1].questions.forEach(
+      this.extObj.pages[this.sessionVars.rootPage - 1].questions.forEach(
         question => {
           if (question.required) {
             if (question.response == null || undefined || "")
-              sessionVars.errors.push(question.id);
+              this.sessionVars.errors.push(question.id);
           }
         }
       );
 
-      if (sessionVars.errors.length != 0) {
-        this.$scrollTo(document.getElementById(sessionVars.errors[0]), 500, {
+      if (this.sessionVars.errors.length != 0) {
+        this.$scrollTo(document.getElementById(this.sessionVars.errors[0]), 500, {
           force: false,
           offset: -300
         });
       } else {
-        sessionVars.confirmed = true;
+        this.sessionVars.confirmed = true;
       }
     },
 
@@ -230,7 +173,8 @@ export default {
               question.lnkResponse.forEach(element => {
                 ids.push(element.id);
               });
-              //Stockage de toutes les questions concernées dans un tableau de référence
+              //Stockage de toutes les questions concernées dans un tableau de
+              //référence
               this.ifDisplay.push({
                 id: question.id,
                 lnkQuestion: question.lnkQuestion,
@@ -268,8 +212,8 @@ export default {
               // Parcours des règles d'affichage
 
               this.ifDisplay.forEach(ifd => {
-                // Inscription au buffer
-                // Si l'id concerné est contenu dans le tableau
+                // Inscription au buffer Si l'id concerné est contenu dans le
+                // tableau
                 if (
                   ifd.lnkQuestion == question.id &&
                   ifd.lnkResponse.includes(id)
@@ -304,9 +248,9 @@ export default {
       this.$http
         .post(
           "services/confirm?" +
-            sessionVars.tokenName +
+            this.sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpResp => {
@@ -330,9 +274,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            sessionVars.tokenName +
+            this.sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
@@ -365,9 +309,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            sessionVars.tokenName +
+            this.sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => console.log(httpresp))
@@ -382,9 +326,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            sessionVars.tokenName +
+            this.sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .catch(error => {
@@ -395,51 +339,55 @@ export default {
       this.$router.push({
         name: "enquete",
         params: {
-          rootPage: sessionVars.rootPage
+          rootPage: this.sessionVars.rootPage
         }
       });
-      if (sessionVars.tokenName == "com") {
+      if (this.sessionVars.tokenName == "com") {
         this.$router.push({
           query: {
-            com: sessionVars.tokenValue
+            com: this.sessionVars.tokenValue
           }
         });
-      } else if (sessionVars.tokenName == "auth") {
+      } else if (this.sessionVars.tokenName == "auth") {
         this.$router.push({
           query: {
-            auth: sessionVars.tokenValue
+            auth: this.sessionVars.tokenValue
           }
         });
-      } else if (sessionVars.tokenName == "ano") {
+      } else if (this.sessionVars.tokenName == "ano") {
         this.$router.push({
           query: {
-            ano: sessionVars.tokenValue
+            ano: this.sessionVars.tokenValue
           }
         });
       }
       if (!noReload) {
-        // sessionVars.pageRefresh = true
+        // this.sessionVars.pageRefresh = true
       }
     },
     darkTime() {
-      window.document.body.style.backgroundColor = "#1b1b1b";
+      this.darkMode = !this.darkMode;
+      if (this.darkMode) {
+        window.document.body.style.backgroundColor = "#1b1b1b";
+      } else {
+        window.document.body.style.backgroundColor = "#ffffff";
+      }
     }
   },
   mounted() {
-    sessionVars.rootPage = parseInt(this.$route.params.rootPage);
-
+    this.sessionVars.rootPage = parseInt(this.$route.params.rootPage);
     if (this.$route.query.auth) {
       // l'utilisateur est authentifié : le token ne change pas
-      sessionVars.tokenName = "auth";
-      sessionVars.tokenValue = this.$route.query.auth;
+      this.sessionVars.tokenName = "auth";
+      this.sessionVars.tokenValue = this.$route.query.auth;
     } else if (this.$route.query.ano) {
-      sessionVars.tokenName = "ano";
-      sessionVars.tokenValue = this.$route.query.ano;
+      this.sessionVars.tokenName = "ano";
+      this.sessionVars.tokenValue = this.$route.query.ano;
     } else {
       console.log("com");
       // l'utilisateur est anonyme : le token change au premier appel
-      sessionVars.tokenName = "com";
-      sessionVars.tokenValue = this.$route.query.com;
+      this.sessionVars.tokenName = "com";
+      this.sessionVars.tokenValue = this.$route.query.com;
     }
 
     console.log(this.$route.query);
@@ -447,16 +395,16 @@ export default {
     this.$http
       .get(
         "services/survey?" +
-          sessionVars.tokenName +
+          this.sessionVars.tokenName +
           "=" +
-          encodeURIComponent(sessionVars.tokenValue)
+          encodeURIComponent(this.sessionVars.tokenValue)
       )
       .then(
         console.log(
           "services/survey?" +
-            sessionVars.tokenName +
+            this.sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue)
+            encodeURIComponent(this.sessionVars.tokenValue)
         )
       )
       .then(response => {
@@ -473,8 +421,8 @@ export default {
         } else {
           this.isOpen = false;
         }
-        sessionVars.tokenName = response.data.NameKey;
-        sessionVars.tokenValue = response.data.ValueKey;
+        this.sessionVars.tokenName = response.data.NameKey;
+        this.sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
         this.refreshPage(true);
         console.log("succes");
@@ -484,8 +432,6 @@ export default {
         this.errored = true;
       })
       .finally(() => (this.loaded = true));
-    if (this.darkTime) {
-    }
   }
 };
 </script>

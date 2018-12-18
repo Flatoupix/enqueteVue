@@ -6,7 +6,8 @@
   </div>
 </template>
 <script>
-import sessionVars from "../store/GlobalContextInfos";
+
+import sessionVars from '../store/GlobalContextInfos.js'
 
 export default {
   props: {
@@ -19,11 +20,6 @@ export default {
       default: () => 0
     }
   },
-  data() {
-    return {
-      sessionVars: sessionVars
-    };
-  },
   methods: {
     scrollUp() {
       this.$scrollTo(sessionVars.rootPage, 0, {
@@ -33,7 +29,7 @@ export default {
     submitForm(response) {
       this.isRequired();
       if (sessionVars.errors.length == 0) {
-        if (this.sessionVars.confirmed) {
+        if (sessionVars.confirmed) {
           this.$emit("formConfirmed");
         }
       }
