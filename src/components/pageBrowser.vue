@@ -42,6 +42,7 @@ export default {
       if (sessionVars.errors.length == 0) {
         if (sessionVars.rootPage < this.pagesNumber) {
           sessionVars.rootPage++;
+          this.scrollUp()
           this.$emit("refresh");
         }
       }
@@ -49,6 +50,7 @@ export default {
     prevPage() {
       if (sessionVars.rootPage >= this.pagesNumber) {
         sessionVars.rootPage--;
+        this.scrollUp()
         this.$emit("refresh");
       }
     }

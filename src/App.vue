@@ -89,6 +89,7 @@ import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
 import typeFile from "./components/typeFile.vue";
 import datePickerVue from "./components/datePicker.vue";
+import sessionVars from './store/GlobalContextInfos.js'
  
 
 export default {
@@ -118,7 +119,7 @@ export default {
       urlHeader: {},
       urlLocation: window.location.origin,
 
-      rootPage: this.sessionVars.rootPage,
+      rootPage: sessionVars.rootPage,
       pagesNumber: 0,
       modelPage: 1,
 
@@ -131,31 +132,31 @@ export default {
 
       loaded: false,
       errored: false,
-      // debugVars: sessionVars,
+      debugVars: sessionVars,
       debugMode: false,
       darkMode: false
     };
   },
   methods: {
     checkForm() {
-      this.sessionVars.errors = [];
+      sessionVars.errors = [];
 
-      this.extObj.pages[this.sessionVars.rootPage - 1].questions.forEach(
+      this.extObj.pages[sessionVars.rootPage - 1].questions.forEach(
         question => {
           if (question.required) {
             if (question.response == null || undefined || "")
-              this.sessionVars.errors.push(question.id);
+              sessionVars.errors.push(question.id);
           }
         }
       );
 
-      if (this.sessionVars.errors.length != 0) {
-        this.$scrollTo(document.getElementById(this.sessionVars.errors[0]), 500, {
+      if (sessionVars.errors.length != 0) {
+        this.$scrollTo(document.getElementById(sessionVars.errors[0]), 500, {
           force: false,
           offset: -300
         });
       } else {
-        this.sessionVars.confirmed = true;
+        sessionVars.confirmed = true;
       }
     },
 
@@ -248,9 +249,9 @@ export default {
       this.$http
         .post(
           "services/confirm?" +
-            this.sessionVars.tokenName +
+            sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue),
+            encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpResp => {
@@ -274,9 +275,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            this.sessionVars.tokenName +
+            sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue),
+            encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
@@ -309,9 +310,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            this.sessionVars.tokenName +
+            sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue),
+            encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => console.log(httpresp))
@@ -326,9 +327,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            this.sessionVars.tokenName +
+            sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue),
+            encodeURIComponent(sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .catch(error => {
@@ -339,30 +340,30 @@ export default {
       this.$router.push({
         name: "enquete",
         params: {
-          rootPage: this.sessionVars.rootPage
+          rootPage: sessionVars.rootPage
         }
       });
-      if (this.sessionVars.tokenName == "com") {
+      if (sessionVars.tokenName == "com") {
         this.$router.push({
           query: {
-            com: this.sessionVars.tokenValue
+            com: sessionVars.tokenValue
           }
         });
-      } else if (this.sessionVars.tokenName == "auth") {
+      } else if (sessionVars.tokenName == "auth") {
         this.$router.push({
           query: {
-            auth: this.sessionVars.tokenValue
+            auth: sessionVars.tokenValue
           }
         });
-      } else if (this.sessionVars.tokenName == "ano") {
+      } else if (sessionVars.tokenName == "ano") {
         this.$router.push({
           query: {
-            ano: this.sessionVars.tokenValue
+            ano: sessionVars.tokenValue
           }
         });
       }
       if (!noReload) {
-        // this.sessionVars.pageRefresh = true
+        // sessionVars.pageRefresh = true
       }
     },
     darkTime() {
@@ -375,19 +376,19 @@ export default {
     }
   },
   mounted() {
-    this.sessionVars.rootPage = parseInt(this.$route.params.rootPage);
+    sessionVars.rootPage = parseInt(this.$route.params.rootPage);
     if (this.$route.query.auth) {
       // l'utilisateur est authentifié : le token ne change pas
-      this.sessionVars.tokenName = "auth";
-      this.sessionVars.tokenValue = this.$route.query.auth;
+      sessionVars.tokenName = "auth";
+      sessionVars.tokenValue = this.$route.query.auth;
     } else if (this.$route.query.ano) {
-      this.sessionVars.tokenName = "ano";
-      this.sessionVars.tokenValue = this.$route.query.ano;
+      sessionVars.tokenName = "ano";
+      sessionVars.tokenValue = this.$route.query.ano;
     } else {
       console.log("com");
       // l'utilisateur est anonyme : le token change au premier appel
-      this.sessionVars.tokenName = "com";
-      this.sessionVars.tokenValue = this.$route.query.com;
+      sessionVars.tokenName = "com";
+      sessionVars.tokenValue = this.$route.query.com;
     }
 
     console.log(this.$route.query);
@@ -395,16 +396,16 @@ export default {
     this.$http
       .get(
         "services/survey?" +
-          this.sessionVars.tokenName +
+          sessionVars.tokenName +
           "=" +
-          encodeURIComponent(this.sessionVars.tokenValue)
+          encodeURIComponent(sessionVars.tokenValue)
       )
       .then(
         console.log(
           "services/survey?" +
-            this.sessionVars.tokenName +
+            sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue)
+            encodeURIComponent(sessionVars.tokenValue)
         )
       )
       .then(response => {
@@ -421,8 +422,8 @@ export default {
         } else {
           this.isOpen = false;
         }
-        this.sessionVars.tokenName = response.data.NameKey;
-        this.sessionVars.tokenValue = response.data.ValueKey;
+        sessionVars.tokenName = response.data.NameKey;
+        sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
         this.refreshPage(true);
         console.log("succes");

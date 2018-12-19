@@ -10,6 +10,7 @@ const sessionVars = {
   errors: [],
 
   currentTheme:null,
+  currentThemeDisp:null,
 
   confirmed: false
 };

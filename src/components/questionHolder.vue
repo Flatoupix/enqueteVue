@@ -1,45 +1,46 @@
 <template>
   <div class="questionsHolder">
-    <div class="themeTitle" v-if="toto!=''" >{{ toto }}</div>
+    <div
+      class="themeTitle"
+    v-if="question.theme != sessionVars.currentTheme && count==0">{{question.theme}}</div>
     <h3
       v-if="sessionVars.errors.length >= 1"
       :class="[question.required ? 'required' : '']"
-    >
-      {{ question.question }}
+    > {{ question.question }}
     </h3>
-    <h3 v-else>
-      {{ question.question }}
-      <span v-if="question.required" style="color:#bb1515">*</span>
-    </h3>
+    <h3 v-else> {{ question.question }} <span
+        v-if="question.required"
+        style="color:#bb1515"
+      >*</span></h3>
     <slot></slot>
   </div>
 </template>
 
+
 <script>
+import sessionVars from "../store/GlobalContextInfos.js";
+
 export default {
   props: {
     question: {
       type: Object,
       default: () => {}
-    },
-
-  },
-  computed:{
-    toto(){
-   
-    if (this.sessionVars.currentTheme != this.question.theme) {
-      
-      this.sessionVars.currentTheme = this.question.theme;
-        return this.sessionVars.currentTheme
     }
-    else
-       return ""
+  },
+  data() {
+    return {
+      count:0
     }
   },
   created() {
-   // console.log("question = " + this.question.theme);
-
-    
+    console.log(sessionVars.currentTheme);
+    if (this.question.theme != sessionVars.currentTheme) {
+      sessionVars.currentTheme = this.question.theme;
+      this.count=0
+    } else {
+      this.count++
+      sessionVars.currentThemeDisp = "";
+    }
   }
 };
 </script>
