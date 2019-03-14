@@ -1,5 +1,8 @@
 <template>
-  <div id="fileUpload">
+  <div
+    v-if="browser != null && browser.name != 'ie'"
+    id="fileUpload"
+  >
     <div
       @mouseover="warnOff()"
       :class="['sizeWarnClass', sizeWarning ? 'warnAppear':'']"
@@ -53,8 +56,34 @@
     </div>
 
   </div>
+
+  <div
+    class="ieStyle"
+    v-else
+  >
+    <input
+      type="file"
+      id="attachment"
+      ref="fileattachment"
+      @change="handleFileUpload()"
+    />
+    <div
+      class="ieFiles"
+      v-for="file in files"
+      :key="file.id"
+    >
+      <div>{{ file.name }}</div>
+      <span v-if="uppedFiles.includes(file.name)">Envoyé</span>
+      <button
+        v-else
+        @click="submitFile(file.name)"
+      >Envoyer</button>
+    </div>
+  </div>
 </template>
 <script>
+import { detect } from "detect-browser";
+
 export default {
   props: {
     question: {
@@ -75,7 +104,8 @@ export default {
         "=" +
         encodeURIComponent(this.sessionVars.tokenValue),
       uppedFiles: [],
-      fileIDs: []
+      fileIDs: [],
+      browser: null
     };
   },
   methods: {
@@ -97,6 +127,7 @@ export default {
       }
     },
     submitFile(fileUpped) {
+      console.log(fileUpped);
       let formData = new FormData();
       this.sessionVars.serviceName = "attachment?";
 
@@ -184,7 +215,6 @@ export default {
       for (const file of this.$refs.fileattachment.files) {
         if (file.size <= this.sizeLimit) {
           this.files.push(file);
-          console.log(this.uppedFiles);
         } else {
           this.sizeWarning = true;
           console.log("bip");
@@ -196,7 +226,8 @@ export default {
     }
   },
   mounted() {
-    
+    this.browser = detect();
+
     if (this.question.response != null) {
       this.question.response.value.forEach(item => {
         this.files.push(item);
@@ -416,5 +447,27 @@ div#fileUpload > div.panelDown > div.fileParent > div.file {
 }
 div#fileUpload > label > input#attachment {
   display: none;
+}
+div.ieStyle input {
+  border: inherit;
+  border-bottom: inherit;
+  background-color: inherit;
+  text-align: inherit;
+  font-size: inherit;
+  padding: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+div.ieFiles {
+  margin: 10px auto;
+}
+div.ieFiles div {
+  margin-right: 10px;
+}
+div.ieFiles > div:last-child {
+  color: #bb1515;
+}
+div.ieFiles > * {
+  display: inline-block;
 }
 </style>

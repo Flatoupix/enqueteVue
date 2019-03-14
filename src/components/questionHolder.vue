@@ -2,7 +2,8 @@
   <div class="questionsHolder">
     <div
       class="themeTitle"
-    v-if="question.theme != sessionVars.currentTheme && count==0">{{question.theme}}</div>
+      v-if="count==0"
+    >{{question.theme}}</div>
     <h3
       v-if="sessionVars.errors.length >= 1"
       :class="[question.required ? 'required' : '']"
@@ -29,17 +30,15 @@ export default {
   },
   data() {
     return {
-      count:0
-    }
+      count: 0
+    };
   },
   created() {
-    console.log(sessionVars.currentTheme);
     if (this.question.theme != sessionVars.currentTheme) {
       sessionVars.currentTheme = this.question.theme;
-      this.count=0
+      this.count = 0;
     } else {
-      this.count++
-      sessionVars.currentThemeDisp = "";
+      this.count++;
     }
   }
 };

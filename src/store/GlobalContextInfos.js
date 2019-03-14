@@ -9,8 +9,7 @@ const sessionVars = {
   modelPage: 1,
   errors: [],
 
-  currentTheme:null,
-  currentThemeDisp:null,
+  currentTheme: null,
 
   confirmed: false
 };

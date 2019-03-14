@@ -7,7 +7,6 @@ import sessionVars from "./store/GlobalContextInfos";
 import axios from "axios";
 import VueScrollTo from "vue-scrollto";
 import VTooltip from "v-tooltip";
- 
 
 Vue.prototype.$http = axios;
 Vue.use(VTooltip, {

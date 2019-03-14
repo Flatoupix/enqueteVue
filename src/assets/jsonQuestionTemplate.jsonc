@@ -1,0 +1,87 @@
+{
+  "title": "", // Bon bah... le titre quoi...
+  "subtitle": "", //..
+
+  "date": {
+    "start": "", //Date de début
+    "end": "" // Date de fin
+  },
+  "description": "",
+  "synthesis": {
+    "userType": "", // ano, auth etc...
+    "status": ["untouched", "started", "confirmed"], //Dans quel état est le questionnaire, commencé ou non terminé ?
+    "questions": [
+      //là le but est tout simplement de passer toutes les question d'affilée.
+      {
+        "required": true,
+        "watermark": null,
+        "isHiding": false,
+        "type": "DATE",
+        "id": 80,
+        "order": 1.0,
+        "theme": "Votre appel",
+        "question": "Date de votre appel",
+        "toolTip": null,
+        "response": {
+          // Toutes les réponses à cette question
+          "idQuestion": 80,
+          "value": "2019-01-01T00:00:00Z"
+        },
+        "lnkResponse": null,
+        "lnkQuestion": null
+      },
+      {
+        "required": false,
+        "watermark": null,
+        "isHiding": false,
+        "type": "NUM",
+        "id": 88,
+        "order": 2.0,
+        "theme": "Votre appel",
+        "question": "Combien de temps en minutes avez-vous passé avec le service client ?",
+        "toolTip": null,
+        "response": {
+          "idQuestion": 88,
+          "value": 1
+        },
+        "lnkResponse": null,
+        "lnkQuestion": null
+      },
+      {
+        "required": false,
+        "watermark": null,
+        "responseChoices": [
+          {
+            "id": 3020650,
+            "value": "Pas du tout satisfait"
+          },
+          {
+            "id": 3020661,
+            "value": "Pas satisfait"
+          },
+          {
+            "id": 3020662,
+            "value": "Satisfait"
+          },
+          {
+            "id": 3020672,
+            "value": "Entièrement satisfait"
+          }
+        ],
+        "isHiding": false,
+        "type": "SIMPLE",
+        "id": 81,
+        "order": 3.0,
+        "theme": "Votre appel",
+        "question": "Comment jugez-vous la qualité de votre appel",
+        "toolTip": null,
+        "response": {
+          "idQuestion": 81,
+          "value": [3020650]
+        },
+        "lnkResponse": null,
+        "lnkQuestion": null
+      }
+    ]
+  }
+}
