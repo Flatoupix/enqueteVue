@@ -1,22 +1,22 @@
 <template>
   <div class="questionsHolder">
-    <div
-      class="themeTitle"
-      v-if="count==0"
-    >{{question.theme}}</div>
+    <div class="themeTitle" v-if="count == 0 && count != null">
+      {{ question.theme }}
+    </div>
     <h3
       v-if="sessionVars.errors.length >= 1"
       :class="[question.required ? 'required' : '']"
-    > {{ question.question }}
+    >
+      {{ question.question }}
+      <span v-if="question.required" style="color:red">*</span>
     </h3>
-    <h3 v-else> {{ question.question }} <span
-        v-if="question.required"
-        style="color:#bb1515"
-      >*</span></h3>
+    <h3 v-else>
+      {{ question.question }}
+      <span v-if="question.required" style="color:red">*</span>
+    </h3>
     <slot></slot>
   </div>
 </template>
-
 
 <script>
 import sessionVars from "../store/GlobalContextInfos.js";

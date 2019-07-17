@@ -1,16 +1,9 @@
 <template>
-  <div
-    id="app"
-    @click.ctrl="darkTime()"
-  >
-    <!-- <div>{{'Navigateur = ' + browser.name}}</div> -->
-    <div
-      class="badToken"
-      v-if="errored"
-    >
+  <div id="app" @click.ctrl="darkTime()">
+    <div class="badToken" v-if="errored">
       <h2>Une erreur est survenue.</h2>
     </div>
-    <div v-if="loaded&&!errored">
+    <div v-if="loaded && !errored">
       <PageButtons
         v-show="!isConfirmed && isOpen"
         :page="extObj.pages"
@@ -20,99 +13,94 @@
         @refresh="refreshPage"
       />
 
-      <div
-        v-show="sessionVars.rootPage==1 && extObj.pic!=null"
-        class="bannerImg"
-        :style="{ backgroundImage: 'url(' + extObj.pic + ')' }"
-      >
+      <img
+        v-show="sessionVars.rootPage == 1 && extObj.pic != null"
+        :src="extObj.pic"
+      />
+      <h1 v-show="sessionVars.rootPage == 1">{{ extObj.title }}</h1>
+      <h2 v-show="isOpen && sessionVars.rootPage == 1">
+        {{ extObj.subTitle }}
+      </h2>
+      <h2 v-show="!isOpen">{{ extObj.closureMsg }}</h2>
 
-      </div>
-      <h1 v-show="sessionVars.rootPage==1">{{extObj.title}}</h1>
-      <h2 v-show="isOpen&& sessionVars.rootPage==1">{{extObj.subTitle}}</h2>
-      <h2 v-show="!isOpen">{{extObj.closureMsg}}</h2>
-
-      <p v-show="!isConfirmed && isOpen &&
-      sessionVars.rootPage==1">{{extObj.description}}</p>
-      <p v-show="isConfirmed">{{extObj.confirmMsg}}</p>
+      <p v-show="!isConfirmed && isOpen && sessionVars.rootPage == 1">
+        {{ extObj.description }}
+      </p>
+      <p v-show="isConfirmed" v-html="extObj.confirmMsg"></p>
 
       <PageHolder
-        v-show="sessionVars.rootPage==page.number && !isConfirmed &&
-      isOpen"
+        v-show="sessionVars.rootPage == page.number && !isConfirmed && isOpen"
         :page="page"
         :key="page.number"
         :id="page.number"
-        v-for="page in
-      extObj.pages"
+        v-for="page in extObj.pages"
       >
-
         <QuestionHolder
           :id="questions.id"
           :question="questions"
           v-for="questions in page.questions"
-          v-show="!questions.isHiding ||
-        show.includes(questions.id)"
+          v-show="!questions.isHiding || show.includes(questions.id)"
           :key="questions.id"
         >
-
           <PillButtons
             @responseInput="postResponse($event)"
-            v-if="(questions.type=='LISTE' || questions.type=='BOOL')"
+            v-if="questions.type == 'LISTE' || questions.type == 'BOOL'"
             :question="questions"
           />
           <VueStars
             @responseInput="postResponse($event)"
-            v-if="questions.type=='STARS'"
+            v-if="questions.type == 'STARS'"
             :question="questions"
           ></VueStars>
 
           <Range
             type="range"
             @responseInput="postResponse($event)"
-            v-if="questions.type=='RANGE' && page.number == sessionVars.rootPage"
+            v-if="
+              questions.type == 'RANGE' && page.number == sessionVars.rootPage
+            "
             :question="questions"
           />
 
           <CheckBoxes
             @responseInput="postResponse($event)"
-            v-if="questions.type=='MULTI' || questions.type=='SIMPLE' "
+            v-if="questions.type == 'MULTI' || questions.type == 'SIMPLE'"
             :question="questions"
           />
           <DatePicker
             @responseInput="postResponse($event)"
             :question="questions"
-            v-if="(questions.type=='DATE' ||
-          questions.type=='BIRTHDAY')"
+            v-if="questions.type == 'DATE' || questions.type == 'BIRTHDAY'"
           />
 
           <typeInput
             :tooltip="questions.toolTip"
             @responseInput="postResponse($event)"
-            v-if="questions.type=='NUM' ||
-          questions.type=='TEXT' || questions.type=='MEMO'"
+            v-if="
+              questions.type == 'NUM' ||
+                questions.type == 'TEXT' ||
+                questions.type == 'MEMO'
+            "
             v-model="input"
             :question="questions"
           />
 
           <typeSignature
-            v-if="questions.type=='CAPTURE' && page.number ==
-          sessionVars.rootPage"
+            v-if="
+              questions.type == 'CAPTURE' && page.number == sessionVars.rootPage
+            "
             @responseInput="postCapture($event)"
             :question="questions"
           />
 
           <typeFile
-            v-if="questions.type=='FILE'"
+            v-if="questions.type == 'FILE'"
             @responseInput="postFile($event)"
             :question="questions"
           />
-
         </QuestionHolder>
-
       </PageHolder>
-      <PageHolder
-        v-show="isConfirmed "
-        :closeMsg="extObj.closureMsg"
-      />
+      <PageHolder v-show="isConfirmed" :closeMsg="extObj.closureMsg" />
       <PageBrowser
         v-show="!isConfirmed && isOpen"
         :pagesNumber="pagesNumber"
@@ -122,17 +110,15 @@
         @formConfirmed="finalPost()"
         @scan="checkForm()"
       ></PageBrowser>
-      <div class="pwrBy">Powered by Eudonet</div>
+      <div>
+        <div v-if="!extObj.footForm" class="pwrBy">Powered by Eudonet</div>
+        <div v-else v-html="extObj.footForm"></div>
+      </div>
     </div>
-    <div
-      class="loadContainer"
-      v-if="!loaded"
-    >
+    <div class="loadContainer" v-if="!loaded">
       <div class="loading"></div>
-
     </div>
   </div>
-
 </template>
 
 <script>
@@ -204,9 +190,11 @@ export default {
 
       this.extObj.pages[sessionVars.rootPage - 1].questions.forEach(
         question => {
-          if (question.required) {
-            if (question.response == null || undefined || "")
-              sessionVars.errors.push(question.id);
+          if (question.type != ("STARS" && "MEMO")) {
+            if (question.required) {
+              if (question.response == null || undefined || "")
+                sessionVars.errors.push(question.id);
+            }
           }
         }
       );
@@ -553,13 +541,7 @@ select {
   color: inherit;
   font-weight: inherit;
 }
-div.bannerImg {
-  height: 26vw;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  margin: 0 auto;
-}
+
 
 .questionsHolder {
   margin: 2em 0;

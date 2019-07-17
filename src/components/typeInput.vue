@@ -1,10 +1,31 @@
 <template>
   <div>
-    <input v-tooltip="question.toolTip"  :placeholder="question.watermark" v-if="question.type=='TEXT'" class="textField" type="text" @input="select(input,question.id)" v-model="input" />
-    <input  v-tooltip="question.toolTip" :placeholder="question.watermark" v-if="question.type=='NUM'" type="number" @input="select(input,question.id)" v-model="input" />
-    <textarea v-tooltip="question.toolTip" :placeholder="question.watermark" v-if="question.type=='MEMO'" @input="select(input,question.id)" v-model="input" />
+    <input
+      v-tooltip="question.toolTip"
+      :placeholder="question.watermark"
+      v-if="question.type == 'TEXT'"
+      class="textField"
+      type="text"
+      @input="select(input, question.id)"
+      v-model="input"
+    />
+    <input
+      v-tooltip="question.toolTip"
+      :placeholder="question.watermark"
+      v-if="question.type == 'NUM'"
+      type="number"
+      @input="select(input, question.id)"
+      v-model="input"
+    />
+    <textarea
+      v-tooltip="question.toolTip"
+      :placeholder="question.watermark"
+      v-if="question.type == 'MEMO'"
+      class="textField"
+      @input="select(input, question.id)"
+      v-model="input"
+    />
   </div>
-
 </template>
 
 <script>
@@ -41,16 +62,11 @@ export default {
   width: 81vw;
   text-align: left;
   text-indent: 0.5em;
+  font-family: Cabin, sans-serif;
 }
 input[type="Number"] {
   font-size: 1.5em;
   width: 3.5em;
   padding: 0.2em 0.2em;
-}
-textarea {
-  text-align: left;
-  width: 100%;
-  height: 3em;
-  font-size: 1.5em;
 }
 </style>

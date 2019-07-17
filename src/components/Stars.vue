@@ -1,5 +1,14 @@
 <template>
-  <Stars :show-rating="false" inactive-color="#efefef" active-color="#bb1515" :max-rating="question.number" @rating-selected="select(starsValue,question.id)" v-model="starsValue" />
+  <div>
+    <Stars
+      ref="stars"
+      inactive-color="#efefef"
+      active-color="#bb1515"
+      :max-rating="question.number"
+      @mouseover.native="print()"
+      @rating-selected="select($event, question.id)"
+    />
+  </div>
 </template>
 
 <script>
@@ -23,12 +32,18 @@ export default {
       this.savedChoice = null;
     }
     return {
-      rating: null,
-      starsValue: this.savedChoice
+      lastRate: 0
     };
   },
   methods: {
+    print() {
+      this.lastRate = this.$refs.stars.selectedRating;
+    },
     select(response, id) {
+      if (this.lastRate == this.$refs.stars.currentRating) {
+        this.$refs.stars.selectedRating = this.$refs.stars.currentRating = 0;
+      }
+
       this.$emit("responseInput", {
         idQuestion: id,
         value: response

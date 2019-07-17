@@ -1,5 +1,5 @@
 module.exports = {
-  filenameHashing: true,
+  filenameHashing: false,
   outputDir: "../Build",
   assetsDir: "static",
   baseUrl: "./",
