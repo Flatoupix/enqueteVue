@@ -1,15 +1,14 @@
 <template>
-  <div
-    v-if="browser != null && browser.name != 'ie'"
-    id="fileUpload"
-  >
+  <div v-if="browser != null && browser.name != 'ie'" id="fileUpload">
     <div
       @mouseover="warnOff()"
-      :class="['sizeWarnClass', sizeWarning ? 'warnAppear':'']"
-    >Votre fichier dépasse la taille autorisée de 6 Mo</div>
-    <label :class="['headLabel',files.length>=1 ? 'loaded':'']">
-      <div v-if="files.length==1"> {{files.length}} fichier chargé</div>
-      <div v-if="files.length>=2"> {{files.length}} fichiers chargés</div>
+      :class="['sizeWarnClass', sizeWarning ? 'warnAppear' : '']"
+    >
+      Votre fichier dépasse la taille autorisée de 6 Mo
+    </div>
+    <label :class="['headLabel', files.length >= 1 ? 'loaded' : '']">
+      <div v-if="files.length == 1">{{ files.length }} fichier chargé</div>
+      <div v-if="files.length >= 2">{{ files.length }} fichiers chargés</div>
       <div v-else>Ajoutez votre fichier ici</div>
       <input
         type="file"
@@ -18,66 +17,50 @@
         @change="handleFileUpload()"
       />
     </label>
-    <div :class="['panelDown',files.length!=0 ?
-    'down':'']">
+    <div :class="['panelDown', files.length != 0 ? 'down' : '']">
       <!-- <div
         class=""
         @click="sendAll(files)"
       >Tout envoyer</div> -->
-      <div
-        class="fileParent"
-        :key="index"
-        v-for="(file, index) in files"
-      >
-
-        <div :class="['file',uppedFiles.includes(file.name)?'upped':'']">
-          <div class="msgUpd"><span class="fileName">{{file.name}}</span></div>
-          <div class="fileTitle">{{file.name}}</div>
+      <div class="fileParent" :key="index" v-for="(file, index) in files">
+        <div :class="['file', uppedFiles.includes(file.name) ? 'upped' : '']">
+          <div class="msgUpd">
+            <span class="fileName">{{ file.name }}</span>
+          </div>
+          <div class="fileTitle">{{ file.name }}</div>
         </div>
 
-        <div :class="['submitGrid',uppedFiles.includes(file.name)?'sent':'']">
-          <div class='submitFile'>
+        <div
+          :class="['submitGrid', uppedFiles.includes(file.name) ? 'sent' : '']"
+        >
+          <div class="submitFile">
             <div @click="submitFile(file.name)">Envoyer</div>
-            <div
-              @click="deleteFile(index,file.name)"
-              class="deleteFile"
-            >Annuler</div>
+            <div @click="deleteFile(index, file.name)" class="deleteFile">
+              Annuler
+            </div>
           </div>
           <div class="fileActions">
-            <div class="fileSent"> Envoyé !</div>
-            <div
-              class="deleteFile"
-              @click="deleteFile(index,file.name)"
-            >Supprimer</div>
+            <div class="fileSent">Envoyé !</div>
+            <div class="deleteFile" @click="deleteFile(index, file.name)">
+              Supprimer
+            </div>
           </div>
         </div>
       </div>
-
     </div>
-
   </div>
 
-  <div
-    class="ieStyle"
-    v-else
-  >
+  <div class="ieStyle" v-else>
     <input
       type="file"
       id="attachment"
       ref="fileattachment"
       @change="handleFileUpload()"
     />
-    <div
-      class="ieFiles"
-      v-for="file in files"
-      :key="file.id"
-    >
+    <div class="ieFiles" v-for="file in files" :key="file.id">
       <div>{{ file.name }}</div>
       <span v-if="uppedFiles.includes(file.name)">Envoyé</span>
-      <button
-        v-else
-        @click="submitFile(file.name)"
-      >Envoyer</button>
+      <button v-else @click="submitFile(file.name)">Envoyer</button>
     </div>
   </div>
 </template>
@@ -98,11 +81,11 @@ export default {
       sizeLimit: 6000000,
       files: [],
       Url:
-        this.sessionVars.servicePath +
-        this.sessionVars.serviceName +
-        this.sessionVars.tokenName +
+        this.$sessionVars.servicePath +
+        this.$sessionVars.serviceName +
+        this.$sessionVars.tokenName +
         "=" +
-        encodeURIComponent(this.sessionVars.tokenValue),
+        encodeURIComponent(this.$sessionVars.tokenValue),
       uppedFiles: [],
       fileIDs: [],
       browser: null
@@ -129,7 +112,7 @@ export default {
     submitFile(fileUpped) {
       console.log(fileUpped);
       let formData = new FormData();
-      this.sessionVars.serviceName = "attachment?";
+      this.$sessionVars.serviceName = "attachment?";
 
       this.uppedFiles.push(fileUpped);
 
@@ -142,11 +125,11 @@ export default {
       formData.append("Quest", this.question.id);
       this.$http
         .post(
-          this.sessionVars.servicePath +
-            this.sessionVars.serviceName +
-            this.sessionVars.tokenName +
+          this.$sessionVars.servicePath +
+            this.$sessionVars.serviceName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue),
+            encodeURIComponent(this.$sessionVars.tokenValue),
           formData,
           {
             onUploadProgress(e) {
@@ -173,7 +156,7 @@ export default {
       });
     },
     deleteFile(index, fileTarget) {
-      this.sessionVars.serviceName = "deleteattachment?";
+      this.$sessionVars.serviceName = "deleteattachment?";
       let objFormat = {
         idQuestion: this.question.id,
         name: fileTarget,
@@ -183,11 +166,11 @@ export default {
 
       this.$http
         .post(
-          this.sessionVars.servicePath +
-            this.sessionVars.serviceName +
-            this.sessionVars.tokenName +
+          this.$sessionVars.servicePath +
+            this.$sessionVars.serviceName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(this.sessionVars.tokenValue),
+            encodeURIComponent(this.$sessionVars.tokenValue),
           objFormat
         )
         .then(resp => {
@@ -301,7 +284,7 @@ div#fileUpload label.headLabel {
   height: 3rem;
   position: relative;
   background-color: #efefef;
-  z-index: 100;
+  z-index: 1;
   transition: all 0.5s;
   text-overflow: ellipsis;
   overflow: hidden;

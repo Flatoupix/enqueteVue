@@ -9,27 +9,27 @@
         :page="extObj.pages"
         :rootPage="parseInt($route.params.rootPage)"
         @scan="checkForm()"
-        v-model="sessionVars.rootPage"
+        v-model="$sessionVars.rootPage"
         @refresh="refreshPage"
       />
 
       <img
-        v-show="sessionVars.rootPage == 1 && extObj.pic != null"
+        v-show="$sessionVars.rootPage == 1 && extObj.pic != null"
         :src="extObj.pic"
       />
-      <h1 v-show="sessionVars.rootPage == 1">{{ extObj.title }}</h1>
-      <h2 v-show="isOpen && sessionVars.rootPage == 1">
+      <h1 v-show="$sessionVars.rootPage == 1">{{ extObj.title }}</h1>
+      <h2 v-show="isOpen && $sessionVars.rootPage == 1">
         {{ extObj.subTitle }}
       </h2>
       <h2 v-show="!isOpen">{{ extObj.closureMsg }}</h2>
 
-      <p v-show="!isConfirmed && isOpen && sessionVars.rootPage == 1">
+      <p v-show="!isConfirmed && isOpen && $sessionVars.rootPage == 1">
         {{ extObj.description }}
       </p>
       <p v-show="isConfirmed" v-html="extObj.confirmMsg"></p>
 
       <PageHolder
-        v-show="sessionVars.rootPage == page.number && !isConfirmed && isOpen"
+        v-show="$sessionVars.rootPage == page.number && !isConfirmed && isOpen"
         :page="page"
         :key="page.number"
         :id="page.number"
@@ -57,7 +57,7 @@
             type="range"
             @responseInput="postResponse($event)"
             v-if="
-              questions.type == 'RANGE' && page.number == sessionVars.rootPage
+              questions.type == 'RANGE' && page.number == $sessionVars.rootPage
             "
             :question="questions"
           />
@@ -86,8 +86,10 @@
           />
 
           <typeSignature
+            ref="captureType"
             v-if="
-              questions.type == 'CAPTURE' && page.number == sessionVars.rootPage
+              questions.type == 'CAPTURE' &&
+                page.number == $sessionVars.rootPage
             "
             @responseInput="postCapture($event)"
             :question="questions"
@@ -135,7 +137,6 @@ import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
 import typeFile from "./components/typeFile.vue";
 import datePickerVue from "./components/datePicker.vue";
-import sessionVars from "./store/GlobalContextInfos.js";
 
 export default {
   name: "App",
@@ -164,7 +165,7 @@ export default {
       urlHeader: {},
       urlLocation: window.location.origin,
 
-      rootPage: sessionVars.rootPage,
+      rootPage: this.$sessionVars.rootPage,
       pagesNumber: 0,
       modelPage: 1,
 
@@ -177,7 +178,7 @@ export default {
 
       loaded: false,
       errored: false,
-      debugVars: sessionVars,
+      debugVars: this.$sessionVars,
       debugMode: false,
       darkMode: false
 
@@ -186,26 +187,36 @@ export default {
   },
   methods: {
     checkForm() {
-      sessionVars.errors = [];
+      this.$sessionVars.errors = [];
 
-      this.extObj.pages[sessionVars.rootPage - 1].questions.forEach(
+      this.extObj.pages[this.$sessionVars.rootPage - 1].questions.forEach(
         question => {
-          if (question.type != ("STARS" && "MEMO")) {
+          if (question.type != ("STARS" && "MEMO" && "CAPTURE")) {
             if (question.required) {
               if (question.response == null || undefined || "")
-                sessionVars.errors.push(question.id);
+                this.$sessionVars.errors.push(question.id);
+            }
+          } else if (question.type == "CAPTURE") {
+            if (question.required) {
+              if (!this.$sessionVars.signed) {
+                this.$sessionVars.errors.push(question.id);
+              }
             }
           }
         }
       );
 
-      if (sessionVars.errors.length != 0) {
-        this.$scrollTo(document.getElementById(sessionVars.errors[0]), 500, {
-          force: false,
-          offset: -300
-        });
+      if (this.$sessionVars.errors.length != 0) {
+        this.$scrollTo(
+          document.getElementById(this.$sessionVars.errors[0]),
+          500,
+          {
+            force: false,
+            offset: -300
+          }
+        );
       } else {
-        sessionVars.confirmed = true;
+        this.$sessionVars.confirmed = true;
       }
     },
 
@@ -298,9 +309,9 @@ export default {
       this.$http
         .post(
           "services/confirm?" +
-            sessionVars.tokenName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpResp => {
@@ -324,9 +335,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            sessionVars.tokenName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => {
@@ -359,9 +370,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            sessionVars.tokenName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .then(httpresp => console.log(httpresp))
@@ -376,9 +387,9 @@ export default {
         .post(
           "services/" +
             serviceLink +
-            sessionVars.tokenName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue),
+            encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
         .catch(error => {
@@ -389,30 +400,30 @@ export default {
       this.$router.push({
         name: "enquete",
         params: {
-          rootPage: sessionVars.rootPage
+          rootPage: this.$sessionVars.rootPage
         }
       });
-      if (sessionVars.tokenName == "com") {
+      if (this.$sessionVars.tokenName == "com") {
         this.$router.push({
           query: {
-            com: sessionVars.tokenValue
+            com: this.$sessionVars.tokenValue
           }
         });
-      } else if (sessionVars.tokenName == "auth") {
+      } else if (this.$sessionVars.tokenName == "auth") {
         this.$router.push({
           query: {
-            auth: sessionVars.tokenValue
+            auth: this.$sessionVars.tokenValue
           }
         });
-      } else if (sessionVars.tokenName == "ano") {
+      } else if (this.$sessionVars.tokenName == "ano") {
         this.$router.push({
           query: {
-            ano: sessionVars.tokenValue
+            ano: this.$sessionVars.tokenValue
           }
         });
       }
       if (!noReload) {
-        // sessionVars.pageRefresh = true
+        // this.$sessionVars.pageRefresh = true
       }
     },
     darkTime() {
@@ -425,19 +436,19 @@ export default {
     }
   },
   mounted() {
-    sessionVars.rootPage = parseInt(this.$route.params.rootPage);
+    this.$sessionVars.rootPage = parseInt(this.$route.params.rootPage);
     if (this.$route.query.auth) {
       // l'utilisateur est authentifié : le token ne change pas
-      sessionVars.tokenName = "auth";
-      sessionVars.tokenValue = this.$route.query.auth;
+      this.$sessionVars.tokenName = "auth";
+      this.$sessionVars.tokenValue = this.$route.query.auth;
     } else if (this.$route.query.ano) {
-      sessionVars.tokenName = "ano";
-      sessionVars.tokenValue = this.$route.query.ano;
+      this.$sessionVars.tokenName = "ano";
+      this.$sessionVars.tokenValue = this.$route.query.ano;
     } else {
       console.log("com");
       // l'utilisateur est anonyme : le token change au premier appel
-      sessionVars.tokenName = "com";
-      sessionVars.tokenValue = this.$route.query.com;
+      this.$sessionVars.tokenName = "com";
+      this.$sessionVars.tokenValue = this.$route.query.com;
     }
 
     console.log(this.$route.query);
@@ -445,16 +456,16 @@ export default {
     this.$http
       .get(
         "services/survey?" +
-          sessionVars.tokenName +
+          this.$sessionVars.tokenName +
           "=" +
-          encodeURIComponent(sessionVars.tokenValue)
+          encodeURIComponent(this.$sessionVars.tokenValue)
       )
       .then(
         console.log(
           "services/survey?" +
-            sessionVars.tokenName +
+            this.$sessionVars.tokenName +
             "=" +
-            encodeURIComponent(sessionVars.tokenValue)
+            encodeURIComponent(this.$sessionVars.tokenValue)
         )
       )
       .then(response => {
@@ -471,8 +482,8 @@ export default {
         } else {
           this.isOpen = false;
         }
-        sessionVars.tokenName = response.data.NameKey;
-        sessionVars.tokenValue = response.data.ValueKey;
+        this.$sessionVars.tokenName = response.data.NameKey;
+        this.$sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
         this.refreshPage(true);
         console.log("succes");
@@ -541,7 +552,6 @@ select {
   color: inherit;
   font-weight: inherit;
 }
-
 
 .questionsHolder {
   margin: 2em 0;

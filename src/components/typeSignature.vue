@@ -1,9 +1,19 @@
 <template>
   <div id="typeSignature" ref="typeSignature">
-    <VueSignaturePad :class="['VueSignaturePad',signed ? 'locked':'']" :saveType="'image/svg+xml'" ref="signaturePad" />
-    <h4 v-show="signed">Document signé</h4>
-    <button v-show="!signed" @click="undo">Retour</button>
-    <button v-if="!signed" class="saveButton" @click="save(question.id)">Signer</button>
+    <VueSignaturePad
+      :class="['VueSignaturePad', $sessionVars.signed ? 'locked' : '']"
+      :saveType="'image/svg+xml'"
+      ref="signaturePad"
+    />
+    <h4 v-show="$sessionVars.signed">Document signé</h4>
+    <button v-show="!$sessionVars.signed" @click="undo">Retour</button>
+    <button
+      v-if="!$sessionVars.signed"
+      class="saveButton"
+      @click="save(question.id)"
+    >
+      Signer
+    </button>
   </div>
 </template>
 <script>
@@ -28,8 +38,7 @@ export default {
       sizes: {
         height: "",
         width: ""
-      },
-      signed: false
+      }
     };
   },
   methods: {
@@ -48,7 +57,7 @@ export default {
     },
 
     sign() {
-      this.signed = true;
+      this.$sessionVars.signed = true;
       this.$refs.signaturePad.lockSignaturePad();
     }
   },

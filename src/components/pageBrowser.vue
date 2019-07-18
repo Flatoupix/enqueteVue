@@ -1,14 +1,29 @@
 <template>
   <div class="pageBrowser">
-    <button v-if="sessionVars.rootPage>1" @click="prevPage()" class="prevButton">Précédent</button>
-    <button v-if="sessionVars.rootPage<pagesNumber" @click="nextPage()" class="nextButton">Suivant</button>
-    <button v-if="sessionVars.rootPage==pagesNumber" @click="submitForm()" class="nextButton validate">Valider</button>
+    <button
+      v-if="$sessionVars.rootPage > 1"
+      @click="prevPage()"
+      class="prevButton"
+    >
+      Précédent
+    </button>
+    <button
+      v-if="$sessionVars.rootPage < pagesNumber"
+      @click="nextPage()"
+      class="nextButton"
+    >
+      Suivant
+    </button>
+    <button
+      v-if="$sessionVars.rootPage == pagesNumber"
+      @click="submitForm()"
+      class="nextButton validate"
+    >
+      Valider
+    </button>
   </div>
 </template>
 <script>
-
-import sessionVars from '../store/GlobalContextInfos.js'
-
 export default {
   props: {
     rootPage: {
@@ -22,14 +37,14 @@ export default {
   },
   methods: {
     scrollUp() {
-      this.$scrollTo(sessionVars.rootPage, 0, {
+      this.$scrollTo(this.$sessionVars.rootPage, 0, {
         force: true
       });
     },
     submitForm(response) {
       this.isRequired();
-      if (sessionVars.errors.length == 0) {
-        if (sessionVars.confirmed) {
+      if (this.$sessionVars.errors.length == 0) {
+        if (this.$sessionVars.confirmed) {
           this.$emit("formConfirmed");
         }
       }
@@ -39,18 +54,18 @@ export default {
     },
     nextPage() {
       this.isRequired();
-      if (sessionVars.errors.length == 0) {
-        if (sessionVars.rootPage < this.pagesNumber) {
-          sessionVars.rootPage++;
-          this.scrollUp()
+      if (this.$sessionVars.errors.length == 0) {
+        if (this.$sessionVars.rootPage < this.pagesNumber) {
+          this.$sessionVars.rootPage++;
+          this.scrollUp();
           this.$emit("refresh");
         }
       }
     },
     prevPage() {
-      if (sessionVars.rootPage >= this.pagesNumber) {
-        sessionVars.rootPage--;
-        this.scrollUp()
+      if (this.$sessionVars.rootPage >= this.pagesNumber) {
+        this.$sessionVars.rootPage--;
+        this.scrollUp();
         this.$emit("refresh");
       }
     }

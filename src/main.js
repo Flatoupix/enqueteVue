@@ -3,7 +3,6 @@
 import Vue from "vue";
 import router from "./router";
 import App from "./App";
-import sessionVars from "./store/GlobalContextInfos";
 import axios from "axios";
 import VueScrollTo from "vue-scrollto";
 import VTooltip from "v-tooltip";
@@ -55,7 +54,23 @@ Vue.use(VueScrollTo, {
   y: true
 });
 
-Vue.prototype.sessionVars = sessionVars;
+Vue.prototype.$sessionVars = {
+  urlLocation: window.location.origin,
+  tokenName: null,
+  tokenValue: null,
+  servicePath: "services/",
+  serviceName: "",
+  rootPage: 1,
+  pagesNumber: 0,
+  modelPage: 1,
+  errors: [],
+
+  signed: false,
+
+  currentTheme: null,
+
+  confirmed: false
+};
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 

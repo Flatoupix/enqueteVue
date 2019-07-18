@@ -1,13 +1,17 @@
 <template>
   <div class="pageBtnContainer">
-    <button v-for="item in page" :key="item.number" :class="['pageBtn', (sessionVars.rootPage == item.number ? 'active' :
-    '')]" @click="select(item)">{{ item.number }}</button>
+    <button
+      v-for="item in page"
+      :key="item.number"
+      :class="['pageBtn', $sessionVars.rootPage == item.number ? 'active' : '']"
+      @click="select(item)"
+    >
+      {{ item.number }}
+    </button>
   </div>
 </template>
 
 <script>
-import sessionVars from '../store/GlobalContextInfos.js'
-
 export default {
   props: {
     page: {
@@ -21,13 +25,13 @@ export default {
   },
   methods: {
     select(response) {
-      if (response.number != sessionVars.rootPage) {
+      if (response.number != this.$sessionVars.rootPage) {
         this.$emit("scan");
         if (
-          sessionVars.errors == 0 ||
-          response.number < sessionVars.rootPage
+          this.$sessionVars.errors == 0 ||
+          response.number < this.$sessionVars.rootPage
         ) {
-          sessionVars.rootPage = response.number;
+          this.$sessionVars.rootPage = response.number;
           this.$emit("refresh");
           this.$scrollTo(pageHolder, 500, {
             force: false

@@ -4,7 +4,7 @@
       {{ question.theme }}
     </div>
     <h3
-      v-if="sessionVars.errors.length >= 1"
+      v-if="$sessionVars.errors.length >= 1"
       :class="[question.required ? 'required' : '']"
     >
       {{ question.question }}
@@ -19,8 +19,6 @@
 </template>
 
 <script>
-import sessionVars from "../store/GlobalContextInfos.js";
-
 export default {
   props: {
     question: {
@@ -34,8 +32,8 @@ export default {
     };
   },
   created() {
-    if (this.question.theme != sessionVars.currentTheme) {
-      sessionVars.currentTheme = this.question.theme;
+    if (this.question.theme != this.$sessionVars.currentTheme) {
+      this.$sessionVars.currentTheme = this.question.theme;
       this.count = 0;
     } else {
       this.count++;
