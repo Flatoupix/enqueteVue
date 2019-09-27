@@ -21,11 +21,12 @@
       <h2 v-show="isOpen && $sessionVars.rootPage == 1">
         {{ extObj.subTitle }}
       </h2>
-      <h2 v-show="!isOpen">{{ extObj.closureMsg }}</h2>
+      <h2 v-show="!isOpen" v-html="extObj.closureMsg"></h2>
 
-      <p v-show="!isConfirmed && isOpen && $sessionVars.rootPage == 1">
-        {{ extObj.description }}
-      </p>
+      <p
+        v-show="!isConfirmed && isOpen && $sessionVars.rootPage == 1"
+        v-html="extObj.description"
+      ></p>
       <p v-show="isConfirmed" v-html="extObj.confirmMsg"></p>
 
       <PageHolder

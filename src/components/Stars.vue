@@ -2,6 +2,7 @@
   <div>
     <Stars
       ref="stars"
+      :showRating="false"
       inactive-color="#efefef"
       active-color="#bb1515"
       :max-rating="question.number"
