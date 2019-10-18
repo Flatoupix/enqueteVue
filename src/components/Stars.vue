@@ -1,8 +1,21 @@
 <template>
   <div>
     <Stars
+      v-if="question.response.value"
       ref="stars"
-      :showRating="false"
+      :rating="parseInt(question.response.value)"
+      :showRating="true"
+      inactive-color="#efefef"
+      active-color="#bb1515"
+      :max-rating="question.number"
+      @mouseover.native="print()"
+      @rating-selected="select($event, question.id)"
+    />
+    <Stars
+      v-else
+      ref="stars"
+      :rating="5"
+      :showRating="true"
       inactive-color="#efefef"
       active-color="#bb1515"
       :max-rating="question.number"
@@ -50,6 +63,10 @@ export default {
         value: response
       });
     }
+  },
+  mounted() {
+    console.log(this.question.response.value);
+    this.print(parseInt(this.question.response.value));
   }
 };
 </script>

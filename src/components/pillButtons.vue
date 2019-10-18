@@ -1,16 +1,34 @@
-
 <template>
   <div class="buttonsHolder">
-    <select v-tooltip="question.toolTip" @change="select(myValue)" v-if="question.responseChoices.length > 6" v-model="myValue" :id="question.id">
-      <option :key="response.id" v-for="response
-        in question.responseChoices" :responseValue="response" :value="response">{{response.value}}</option>
+    <select
+      v-tooltip="question.toolTip"
+      @change="select(myValue)"
+      v-if="question.responseChoices.length > 6"
+      v-model="myValue"
+      :id="question.id"
+    >
+      <option
+        :key="response.id"
+        v-for="response in question.responseChoices"
+        :responseValue="response"
+        :value="response"
+        >{{ response.value }}</option
+      >
     </select>
 
-    <button v-else v-tooltip="question.toolTip" type="button" v-for="response in question.responseChoices" :key="response.id" :class="['pillBtn', (currentChoice === response.id ?
-    'active' : '')]" :id="response.id" @click="select(response)">
-      {{ response.value }}</button>
+    <button
+      v-else
+      v-tooltip="question.toolTip"
+      type="button"
+      v-for="response in question.responseChoices"
+      :key="response.id"
+      :class="['pillBtn', currentChoice === response.id ? 'active' : '']"
+      :id="response.id"
+      @click="select(response)"
+    >
+      {{ response.value }}
+    </button>
   </div>
-
 </template>
 
 <script>
@@ -22,14 +40,9 @@ export default {
     }
   },
   data() {
-    if (this.question.response != null) {
-      this.savedChoice = this.question.response.value;
-    } else {
-      this.savedChoice = null;
-    }
     return {
       responseValue: null,
-      myValue: "",
+      myValue: null,
       currentChoice: this.savedChoice
     };
   },
@@ -42,6 +55,13 @@ export default {
         value: response.id
       });
     }
+  },
+  mounted() {
+    if (this.question.response != null)
+      this.myValue = this.question.responseChoices.filter(
+        item => item.id === this.question.response.value
+      )[0].value;
+    else this.savedChoice = null;
   }
 };
 </script>
