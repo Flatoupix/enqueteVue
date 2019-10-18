@@ -7,7 +7,7 @@ module.exports = {
     proxy: {
       "/services": {
         target:
-          "//localhost/" +
+          "http://pno-pc.levallois.eudoweb.com" +
           "/Specif/EUDO_EXTDEV_ENQUETE/root/SectionORM/modules/enquete"
       }
     }
