@@ -1,0 +1,20 @@
+{
+    "languages":[
+        {
+            "id":1,
+            "name":"Français",
+            "shortName":"Fr",
+            "wordList":{
+                "Validate":"Valider",
+                "Next":"Suivant",
+                "Save":"Enregistrer",
+                "Back":"Retour",
+                "Sign":"Signer",
+                "Upload_File":"Envoyez votre fichier"
+            }
+
+
+        }
+
+    ]
+}

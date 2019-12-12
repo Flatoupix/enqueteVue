@@ -5,12 +5,13 @@
     </div>
     <div v-if="loaded && !errored">
       <PageButtons
-        v-show="!isConfirmed && isOpen"
+        v-show="!isConfirmed && isOpen && pagesNumber > 1"
         :page="extObj.pages"
         :rootPage="parseInt($route.params.rootPage)"
         @scan="checkForm()"
         v-model="$sessionVars.rootPage"
         @refresh="refreshPage"
+        
       />
 
       <img
@@ -474,9 +475,20 @@ export default {
         this.prevResponses = response.data.responses;
 
         let nowDate = new Date();
+        console.log(
+          "Aujourd'hui = " +
+            nowDate.toLocaleDateString() +
+            " " +
+            "Date de début = " +
+            new Date(response.data.start).toLocaleDateString() +
+            "Date de fin = " +
+            new Date(response.data.end).toLocaleDateString()
+        );
         if (
-          nowDate.toISOString() >= response.data.start &&
-          nowDate.toISOString() <= response.data.end
+          nowDate.toISOString() >=
+            new Date(response.data.start).toLocaleDateString() &&
+          nowDate.toISOString() <=
+            new Date(response.data.end).toLocaleDateString()
         ) {
           console.log(Date());
           this.isOpen = true;

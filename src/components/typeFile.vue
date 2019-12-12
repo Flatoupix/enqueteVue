@@ -110,7 +110,6 @@ export default {
       }
     },
     submitFile(fileUpped) {
-      console.log(fileUpped);
       let formData = new FormData();
       this.$sessionVars.serviceName = "attachment?";
 
@@ -134,20 +133,13 @@ export default {
           {
             onUploadProgress(e) {
               let percent = parseInt(100 - (e.loaded / e.total) * 100);
-              console.log(percent);
             }
           }
         )
         .then(resp => {
           this.fileIDs.push(resp.data.reponse.CurrentIdAnnexe);
-
-          console.log(formData);
-          console.log(resp);
-          console.log("SUCCESS!!");
         })
-        .catch(function() {
-          console.log("FAILURE!!");
-        });
+        .catch(function() {});
     },
     sendAll(items) {
       items.forEach(item => {
@@ -181,14 +173,8 @@ export default {
           // this.files.splice(index, 1);
           // this.fileIDs.splice(index, 1);
           // this.uppedFiles.splice(this.uppedFiles.indexOf(fileTarget), 1);
-          console.log("Obj = " + objFormat);
-          console.log(resp);
-          console.log("DELETE SUCCESS!!");
-          console.log("UppedFiles = " + this.uppedFiles);
         })
-        .catch(function() {
-          console.log("FAILURE DELETE!!");
-        });
+        .catch(function() {});
     },
 
     /*
@@ -200,7 +186,6 @@ export default {
           this.files.push(file);
         } else {
           this.sizeWarning = true;
-          console.log("bip");
         }
       }
     },
@@ -334,6 +319,7 @@ div.deleteFile {
   color: #ccc;
   line-height: 1.4em;
   font-size: 0.7em;
+  position: absolute;
 }
 div#fileUpload > div.panelDown > div.fileParent > div.file > div {
   position: relative;
@@ -396,7 +382,6 @@ div.submitFile {
   transition: 0.5s all;
 }
 div.submitFile:hover {
-  margin-top: -0.9em;
 }
 
 #fileUpload > div.panelDown > div.fileParent {

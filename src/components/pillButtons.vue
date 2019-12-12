@@ -11,7 +11,7 @@
         :key="response.id"
         v-for="response in question.responseChoices"
         :responseValue="response"
-        :value="response"
+        :value="myValue"
         >{{ response.value }}</option
       >
     </select>
@@ -43,7 +43,7 @@ export default {
     return {
       responseValue: null,
       myValue: null,
-      currentChoice: this.savedChoice
+      currentChoice: null
     };
   },
   methods: {
@@ -57,11 +57,10 @@ export default {
     }
   },
   mounted() {
-    if (this.question.response != null)
-      this.myValue = this.question.responseChoices.filter(
-        item => item.id === this.question.response.value
-      )[0].value;
-    else this.savedChoice = null;
+    if (this.question.response != null) {
+      this.currentChoice = this.question.response.value;
+      console.log(this.question.response.id);
+    } else this.savedChoice = null;
   }
 };
 </script>
