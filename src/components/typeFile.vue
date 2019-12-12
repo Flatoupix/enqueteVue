@@ -319,7 +319,6 @@ div.deleteFile {
   color: #ccc;
   line-height: 1.4em;
   font-size: 0.7em;
-  position: absolute;
 }
 div#fileUpload > div.panelDown > div.fileParent > div.file > div {
   position: relative;
@@ -382,6 +381,7 @@ div.submitFile {
   transition: 0.5s all;
 }
 div.submitFile:hover {
+   margin-top: -1em;
 }
 
 #fileUpload > div.panelDown > div.fileParent {

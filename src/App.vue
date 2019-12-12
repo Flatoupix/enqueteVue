@@ -97,7 +97,7 @@
             :question="questions"
           />
 
-          <typeFile
+          <file-input
             v-if="questions.type == 'FILE'"
             @responseInput="postFile($event)"
             :question="questions"
@@ -137,7 +137,7 @@ import VueStars from "./components/Stars.vue";
 import Range from "./components/typeRange.vue";
 import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
-import typeFile from "./components/typeFile.vue";
+import fileInput from "./components/fileInput.vue";
 import datePickerVue from "./components/datePicker.vue";
 
 export default {
@@ -153,7 +153,7 @@ export default {
     VueStars,
     Range,
     typeInput,
-    typeFile,
+    fileInput,
     PageBrowser
   },
   data() {
@@ -708,6 +708,7 @@ select {
   height: 10em;
   border-radius: 10em;
   border-top-style: dashed;
+  border-top-width: 1px;
   border-right-style: dashed;
   border-bottom-style: solid;
   border-left-style: solid;
