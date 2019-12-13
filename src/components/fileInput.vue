@@ -261,7 +261,6 @@ export default {
 }
 div#fileUpload {
   margin: auto;
-  width: 35rem;
   display: inline-block;
   -webkit-user-select: none;
   -moz-user-select: none;

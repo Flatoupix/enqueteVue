@@ -3,7 +3,7 @@
     <select
       v-tooltip="question.toolTip"
       @change="select(myValue)"
-      v-if="question.responseChoices.length > 6"
+      v-if="question.responseChoices.length > 4"
       v-model="myValue"
       :id="question.id"
     >

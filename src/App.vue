@@ -11,7 +11,6 @@
         @scan="checkForm()"
         v-model="$sessionVars.rootPage"
         @refresh="refreshPage"
-        
       />
 
       <img
@@ -194,10 +193,14 @@ export default {
       this.extObj.pages[this.$sessionVars.rootPage - 1].questions.forEach(
         question => {
           if (question.type != ("STARS" && "MEMO" && "CAPTURE")) {
-            if (question.required) {
-              if (question.response == null || undefined || "")
-                this.$sessionVars.errors.push(question.id);
-            }
+            
+              if (this.show.includes(question.id)) {
+                if (question.required) {
+                  if (question.response == null || undefined || "")
+                    this.$sessionVars.errors.push(question.id);
+                }
+              }
+            
           } else if (question.type == "CAPTURE") {
             if (question.required) {
               if (!this.$sessionVars.signed) {
@@ -298,6 +301,7 @@ export default {
           if (question.isHiding) {
             if (buffer.includes(question.id)) {
               this.show.push(question.id);
+              // question.isHiding = false
             }
           }
         });
