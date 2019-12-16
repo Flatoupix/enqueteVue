@@ -188,26 +188,31 @@ export default {
   },
   methods: {
     checkForm() {
-      console.log("Check")
+      console.log("Check");
       this.$sessionVars.errors = [];
 
       this.extObj.pages[this.$sessionVars.rootPage - 1].questions.forEach(
         question => {
           if (question.type != ("STARS" && "MEMO" && "CAPTURE")) {
-            if (question.required&&this.show.includes(question.id)) {
-                if (question.response == null || undefined || "") {
-                  console.log(question)
+            if (question.required) {
+              if (question.response == null || undefined || "") {
+                if (!question.isHiding) {
                   this.$sessionVars.errors.push(question.id);
-              }
-            }
-          } else if (question.type == "CAPTURE") {
-              if (question.required) {
-                if (!this.$sessionVars.signed) {
-                  this.$sessionVars.errors.push(question.id);
+                } else {
+                  if (this.show.includes(question.id)) {
+                    this.$sessionVars.errors.push(question.id);
+                  }
                 }
               }
             }
+          } else if (question.type == "CAPTURE") {
+            if (question.required) {
+              if (!this.$sessionVars.signed) {
+                this.$sessionVars.errors.push(question.id);
+              }
+            }
           }
+        }
       );
 
       if (this.$sessionVars.errors.length != 0) {
@@ -440,6 +445,7 @@ export default {
     }
   },
   mounted() {
+    this.darkTime();
     this.$sessionVars.rootPage = parseInt(this.$route.params.rootPage);
     if (this.$route.query.auth) {
       // l'utilisateur est authentifié : le token ne change pas
