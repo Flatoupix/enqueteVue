@@ -26,7 +26,7 @@ export default {
   methods: {
     select(response) {
       if (response.number != this.$sessionVars.rootPage) {
-        this.$emit("scan");
+        this.$emit("scan")
         if (
           this.$sessionVars.errors == 0 ||
           response.number < this.$sessionVars.rootPage

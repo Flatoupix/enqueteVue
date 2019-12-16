@@ -188,27 +188,28 @@ export default {
   },
   methods: {
     checkForm() {
+      console.log("Check")
       this.$sessionVars.errors = [];
 
       this.extObj.pages[this.$sessionVars.rootPage - 1].questions.forEach(
         question => {
+          console.log('error')
           if (question.type != ("STARS" && "MEMO" && "CAPTURE")) {
-            
+            if (question.required) {
               if (this.show.includes(question.id)) {
-                if (question.required) {
-                  if (question.response == null || undefined || "")
-                    this.$sessionVars.errors.push(question.id);
+                if (question.response == null || undefined || "") {
+                  this.$sessionVars.errors.push(question.id);
                 }
               }
-            
+            }
           } else if (question.type == "CAPTURE") {
-            if (question.required) {
-              if (!this.$sessionVars.signed) {
-                this.$sessionVars.errors.push(question.id);
+              if (question.required) {
+                if (!this.$sessionVars.signed) {
+                  this.$sessionVars.errors.push(question.id);
+                }
               }
             }
           }
-        }
       );
 
       if (this.$sessionVars.errors.length != 0) {
@@ -301,7 +302,6 @@ export default {
           if (question.isHiding) {
             if (buffer.includes(question.id)) {
               this.show.push(question.id);
-              // question.isHiding = false
             }
           }
         });

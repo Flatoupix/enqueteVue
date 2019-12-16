@@ -1,17 +1,17 @@
 <template>
   <div class="buttonsHolder">
     <select
-      v-tooltip="question.toolTip"
-      @change="select(currentChoice)"
       v-if="question.responseChoices.length > 6"
+      v-tooltip="question.toolTip"
+      @change="select(myValue)"
+      v-model="myValue"
       :id="question.id"
-      v-model="currentChoice"
     >
       <option
-
         :key="response.id"
         v-for="response in question.responseChoices"
         :responseValue="response"
+        :value="response"
         >{{ response.value }}</option
       >
     </select>
@@ -22,7 +22,7 @@
       type="button"
       v-for="response in question.responseChoices"
       :key="response.id"
-      :class="['pillBtn', currentChoice === response.id ? 'active' : '']"
+      :class="['pillBtn', myValue === response ? 'active' : '']"
       :id="response.id"
       @click="select(response)"
     >
@@ -41,15 +41,13 @@ export default {
   },
   data() {
     return {
-      myValue:null,
       responseValue: null,
-      currentChoice: null
+      myValue: null,
     };
   },
   methods: {
     select(response) {
-      this.currentChoice = response.id;
-
+      this.myValue = response;
       this.$emit("responseInput", {
         idQuestion: this.question.id,
         value: response.id
@@ -57,10 +55,11 @@ export default {
     }
   },
   mounted() {
-    if (this.question.response != null) {
-      this.currentChoice = this.question.response.value;
-      console.log(this.question.response.id);
-    } else this.savedChoice = null;
+    if (this.question.response != null)
+      this.myValue = this.question.responseChoices.filter(
+        item => item.id === this.question.response.value
+      )[0];
+    else this.myValue = null;
   }
 };
 </script>
