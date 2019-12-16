@@ -489,10 +489,8 @@ export default {
             new Date(response.data.end).toLocaleDateString()
         );
         if (
-          nowDate.toISOString() >=
-            new Date(response.data.start).toLocaleDateString() &&
-          nowDate.toISOString() <=
-            new Date(response.data.end).toLocaleDateString()
+          nowDate.toISOString() >= response.data.start &&
+          nowDate.toISOString() <= response.data.end
         ) {
           console.log(Date());
           this.isOpen = true;

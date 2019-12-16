@@ -14,7 +14,6 @@
     <Stars
       v-else
       ref="stars"
-      :rating="5"
       :showRating="false"
       inactive-color="#efefef"
       active-color="#bb1515"

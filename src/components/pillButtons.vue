@@ -2,16 +2,16 @@
   <div class="buttonsHolder">
     <select
       v-tooltip="question.toolTip"
-      @change="select(myValue)"
-      v-if="question.responseChoices.length > 4"
-      v-model="myValue"
+      @change="select(currentChoice)"
+      v-if="question.responseChoices.length > 6"
       :id="question.id"
+      v-model="currentChoice"
     >
       <option
+
         :key="response.id"
         v-for="response in question.responseChoices"
         :responseValue="response"
-        :value="myValue"
         >{{ response.value }}</option
       >
     </select>
@@ -41,8 +41,8 @@ export default {
   },
   data() {
     return {
+      myValue:null,
       responseValue: null,
-      myValue: null,
       currentChoice: null
     };
   },
