@@ -193,13 +193,11 @@ export default {
 
       this.extObj.pages[this.$sessionVars.rootPage - 1].questions.forEach(
         question => {
-          console.log('error')
           if (question.type != ("STARS" && "MEMO" && "CAPTURE")) {
-            if (question.required) {
-              if (this.show.includes(question.id)) {
+            if (question.required&&this.show.includes(question.id)) {
                 if (question.response == null || undefined || "") {
+                  console.log(question)
                   this.$sessionVars.errors.push(question.id);
-                }
               }
             }
           } else if (question.type == "CAPTURE") {
