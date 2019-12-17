@@ -1,6 +1,7 @@
 <template>
   <div>
     <input
+    
       v-tooltip="question.toolTip"
       :placeholder="question.watermark"
       v-if="question.type == 'TEXT'"
@@ -24,6 +25,7 @@
       class="textField"
       @input="select(input, question.id)"
       v-model="input"
+     
     />
   </div>
 </template>
@@ -47,12 +49,18 @@ export default {
     };
   },
   methods: {
+    preventPaste(event) {
+      console.log(event)
+    },
     select(response, id) {
       this.$emit("responseInput", {
         idQuestion: id,
         value: response
       });
     }
+  },
+  mounted() {
+    
   }
 };
 </script>

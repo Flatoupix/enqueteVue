@@ -1,5 +1,5 @@
 <template>
-  <div id="app" @click.ctrl="darkTime()">
+  <div id="app" @click.ctrl="darkTime()" :class="darkMode ? 'dark' : ''">
     <div class="badToken" v-if="errored">
       <h2>Une erreur est survenue.</h2>
     </div>
@@ -84,6 +84,7 @@
             "
             v-model="input"
             :question="questions"
+           
           />
 
           <typeSignature
@@ -188,7 +189,6 @@ export default {
   },
   methods: {
     checkForm() {
-      console.log("Check");
       this.$sessionVars.errors = [];
 
       this.extObj.pages[this.$sessionVars.rootPage - 1].questions.forEach(
@@ -360,16 +360,13 @@ export default {
                   question.response = this.objFormat;
                 }
                 question.response.value = this.objFormat.value;
-                console.log(this.objFormat);
               }
             });
           });
 
-          console.log("succes");
           this.showQuestion(null);
         })
         .catch(error => {
-          console.log("en erreur");
         });
     },
     postCapture(response, id) {
@@ -384,9 +381,7 @@ export default {
             encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
-        .then(httpresp => console.log(httpresp))
         .catch(error => {
-          console.log("en erreur");
         });
     },
     postFile(response, id) {
@@ -402,7 +397,6 @@ export default {
           JSON.stringify(this.objFormat)
         )
         .catch(error => {
-          console.log("en erreur");
         });
     },
     refreshPage(noReload) {
@@ -439,7 +433,9 @@ export default {
       this.darkMode = !this.darkMode;
       if (this.darkMode) {
         window.document.body.style.backgroundColor = "#1b1b1b";
+        // window.document.getElementById('app').color = "f2f2f2";
       } else {
+        // window.document.getElementById('app').color = "#2c3e50";
         window.document.body.style.backgroundColor = "#ffffff";
       }
     }
@@ -454,13 +450,11 @@ export default {
       this.$sessionVars.tokenName = "ano";
       this.$sessionVars.tokenValue = this.$route.query.ano;
     } else {
-      console.log("com");
       // l'utilisateur est anonyme : le token change au premier appel
       this.$sessionVars.tokenName = "com";
       this.$sessionVars.tokenValue = this.$route.query.com;
     }
 
-    console.log(this.$route.query);
 
     this.$http
       .get(
@@ -470,32 +464,17 @@ export default {
           encodeURIComponent(this.$sessionVars.tokenValue)
       )
       .then(
-        console.log(
-          "services/survey?" +
-            this.$sessionVars.tokenName +
-            "=" +
-            encodeURIComponent(this.$sessionVars.tokenValue)
-        )
       )
       .then(response => {
         this.extObj = response.data;
         this.prevResponses = response.data.responses;
 
         let nowDate = new Date();
-        console.log(
-          "Aujourd'hui = " +
-            nowDate.toLocaleDateString() +
-            " " +
-            "Date de début = " +
-            new Date(response.data.start).toLocaleDateString() +
-            "Date de fin = " +
-            new Date(response.data.end).toLocaleDateString()
-        );
+       
         if (
           nowDate.toISOString() >= response.data.start &&
           nowDate.toISOString() <= response.data.end
         ) {
-          console.log(Date());
           this.isOpen = true;
         } else {
           this.isOpen = false;
@@ -504,10 +483,8 @@ export default {
         this.$sessionVars.tokenValue = response.data.ValueKey;
         this.showQuestion(null);
         this.refreshPage(true);
-        console.log("succes");
       })
       .catch(error => {
-        console.log(error);
         this.errored = true;
       })
       .finally(() => (this.loaded = true));
@@ -520,6 +497,12 @@ export default {
 :focus {
   border: none;
   outline: none;
+}
+body.dark {
+  background-color: #1b1b1b;
+}
+#app.dark {
+  color: #f2f2f2;
 }
 #app {
   font-family: "Cabin", sans-serif;
