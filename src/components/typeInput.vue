@@ -1,7 +1,6 @@
 <template>
   <div>
     <input
-    
       v-tooltip="question.toolTip"
       :placeholder="question.watermark"
       v-if="question.type == 'TEXT'"
@@ -9,6 +8,7 @@
       type="text"
       @input="select(input, question.id)"
       v-model="input"
+      @paste.prevent
     />
     <input
       v-tooltip="question.toolTip"
@@ -17,6 +17,7 @@
       type="number"
       @input="select(input, question.id)"
       v-model="input"
+      @paste.prevent
     />
     <textarea
       v-tooltip="question.toolTip"
@@ -25,7 +26,7 @@
       class="textField"
       @input="select(input, question.id)"
       v-model="input"
-     
+      @paste.prevent
     />
   </div>
 </template>
@@ -49,9 +50,6 @@ export default {
     };
   },
   methods: {
-    preventPaste(event) {
-      console.log(event)
-    },
     select(response, id) {
       this.$emit("responseInput", {
         idQuestion: id,
