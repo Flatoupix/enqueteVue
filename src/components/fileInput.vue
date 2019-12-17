@@ -4,7 +4,7 @@
       @mouseover="warnOff()"
       :class="['sizeWarnClass', sizeWarning ? 'warnAppear' : '']"
     >
-      Votre fichier dépasse la taille autorisée de 6 Mo
+      {{ msgWarn }}
     </div>
     <label :class="['headLabel', files.length >= 1 ? 'loaded' : '']">
       <div v-if="files.length == 1">{{ files.length }} fichier chargé</div>
@@ -24,7 +24,11 @@
       >Tout envoyer</div> -->
       <div class="fileParent" :key="index" v-for="(file, index) in files">
         <div :class="['file', uppedFiles.includes(file.name) ? 'upped' : '']">
-          <div :class="'fileTitle'[uppedFiles.includes(file.name)?'':'msgUpd']">{{ file.name }}</div>
+          <div
+            :class="'fileTitle'[uppedFiles.includes(file.name) ? '' : 'msgUpd']"
+          >
+            {{ file.name }}
+          </div>
         </div>
 
         <div
@@ -38,7 +42,7 @@
           </div>
           <div class="fileActions">
             <div class="fileSent">Envoyé !</div>
-            <div  class="deleteFile" @click="deleteFile(index, file.name)">
+            <div class="deleteFile" @click="deleteFile(index, file.name)">
               X
             </div>
           </div>
@@ -75,6 +79,7 @@ export default {
   data() {
     return {
       sizeWarning: false,
+      msgWarn: "",
       sizeLimit: 6000000,
       files: [],
       Url:
@@ -178,12 +183,23 @@ export default {
         Handles a change on the file upload
       */
     handleFileUpload() {
-      for (const file of this.$refs.fileattachment.files) {
-        if (file.size <= this.sizeLimit) {
-          this.files.push(file);
-        } else {
-          this.sizeWarning = true;
+      console.log(this.files.length);
+
+      if (this.question.max == 0 || this.files.length < this.question.max) {
+        for (const file of this.$refs.fileattachment.files) {
+          if (file.size <= this.sizeLimit) {
+            this.files.push(file);
+          } else {
+            this.msgWarn = "Votre fichier dépasse la taille autorisée de 6 Mo";
+            this.sizeWarning = true;
+          }
         }
+      } else if (this.files.length == this.question.max) {
+        this.msgWarn =
+          "Vous ne pouvez pas ajouter plus de " +
+          this.question.max +
+          " fichiers.";
+        this.sizeWarning = true;
       }
     },
     warnOff() {
@@ -315,7 +331,6 @@ div#fileUpload > div.panelDown {
   overflow: hidden;
 }
 div#fileUpload > div.panelDown > div.fileParent > div.file.upped {
-
 }
 div.fileSent {
   background-color: #636363;
@@ -406,7 +421,6 @@ div.submitFile:hover {
 div#fileUpload > div.panelDown > div.fileParent > div.file {
   background-color: #d7d7d7;
   white-space: nowrap;
-
 
   opacity: 1;
   z-index: -1;
