@@ -84,13 +84,27 @@ export default {
   methods: {
     select(response) {
       if (this.question.type == "MULTI") {
-        response.selected = !response.selected;
-        this.ids = [];
-        this.selections.forEach(element => {
-          if (element.selected) {
-            this.ids.push(element.id);
-          }
-        });
+  
+        if (this.question.max == 0 || response.selected) {
+          response.selected = !response.selected;
+          this.ids = [];
+          this.selections.forEach(element => {
+            if (element.selected) {
+              this.ids.push(element.id);
+            }
+          });
+          
+        } else if (this.selections.filter(selection => selection.selected).length+1 <= this.question.max){
+         
+            response.selected = true
+            this.ids = [];
+            this.selections.forEach(element => {
+              if (element.selected) {
+                this.ids.push(element.id);
+              }
+            });
+          
+        }
       } else {
         this.currentTarget = response.id;
         this.ids = [];
