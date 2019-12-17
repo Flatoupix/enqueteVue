@@ -445,7 +445,6 @@ export default {
     }
   },
   mounted() {
-    this.darkTime();
     this.$sessionVars.rootPage = parseInt(this.$route.params.rootPage);
     if (this.$route.query.auth) {
       // l'utilisateur est authentifié : le token ne change pas

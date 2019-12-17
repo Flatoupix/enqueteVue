@@ -1,7 +1,7 @@
 <template>
   <div class="buttonsHolder">
     <select
-      v-if="question.responseChoices.length > 6"
+      v-if="question.responseChoices.length > 4"
       v-tooltip="question.toolTip"
       @change="select(myValue)"
       v-model="myValue"
