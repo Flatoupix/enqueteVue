@@ -7,15 +7,16 @@
     >
       Précédent
     </button>
+
     <button
-      v-if="$sessionVars.rootPage < pagesNumber"
+      v-if="$sessionVars.rootPage < pagesNumber && !hiddenNxtPage"
       @click="nextPage()"
       class="nextButton"
     >
       Suivant
     </button>
     <button
-      v-if="$sessionVars.rootPage == pagesNumber"
+      v-if="$sessionVars.rootPage == pagesNumber || hiddenNxtPage"
       @click="submitForm()"
       class="nextButton validate"
     >
@@ -33,6 +34,9 @@ export default {
     pagesNumber: {
       type: Number,
       default: () => 0
+    },
+    hiddenNxtPage:{
+      type: Boolean
     }
   },
   methods: {

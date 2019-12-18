@@ -5,7 +5,7 @@
     </div>
     <div v-if="loaded && !errored">
       <PageButtons
-        v-show="!isConfirmed && isOpen && pagesNumber > 1"
+        v-show="!isConfirmed && isOpen && pagesNumber > 1 && !hiddenNxtPage()"
         :page="extObj.pages"
         :rootPage="parseInt($route.params.rootPage)"
         @scan="checkForm()"
@@ -84,7 +84,6 @@
             "
             v-model="input"
             :question="questions"
-           
           />
 
           <typeSignature
@@ -113,6 +112,7 @@
         @refresh="refreshPage"
         @formConfirmed="finalPost()"
         @scan="checkForm()"
+        :hiddenNxtPage="hiddenNxtPage()"
       ></PageBrowser>
       <div>
         <div v-if="!extObj.footForm" class="pwrBy">Powered by Eudonet</div>
@@ -182,7 +182,9 @@ export default {
       errored: false,
       debugVars: this.$sessionVars,
       debugMode: false,
-      darkMode: false
+      darkMode: false,
+
+      // hiddenNxtPage: null
 
       // browser: this.Browser
     };
@@ -366,8 +368,7 @@ export default {
 
           this.showQuestion(null);
         })
-        .catch(error => {
-        });
+        .catch(error => {});
     },
     postCapture(response, id) {
       let serviceLink = "capture?";
@@ -381,8 +382,7 @@ export default {
             encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
-        .catch(error => {
-        });
+        .catch(error => {});
     },
     postFile(response, id) {
       let serviceLink = "attachment?";
@@ -396,8 +396,7 @@ export default {
             encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
         )
-        .catch(error => {
-        });
+        .catch(error => {});
     },
     refreshPage(noReload) {
       this.$router.push({
@@ -433,12 +432,21 @@ export default {
       this.darkMode = !this.darkMode;
       if (this.darkMode) {
         window.document.body.style.backgroundColor = "#1b1b1b";
-        // window.document.getElementById('app').color = "f2f2f2";
       } else {
-        // window.document.getElementById('app').color = "#2c3e50";
         window.document.body.style.backgroundColor = "#ffffff";
       }
+    },
+    hiddenNxtPage() {
+      return this.extObj.pages
+        .filter(page => page.number == this.rootPage + 1)[0]
+        .questions.filter(question => question.isHiding).length ==
+        this.extObj.pages.filter(page => page.number == this.rootPage + 1)[0]
+          .questions.length;
+          
     }
+  },
+  computed: {
+    
   },
   mounted() {
     this.$sessionVars.rootPage = parseInt(this.$route.params.rootPage);
@@ -455,7 +463,6 @@ export default {
       this.$sessionVars.tokenValue = this.$route.query.com;
     }
 
-
     this.$http
       .get(
         "services/survey?" +
@@ -463,14 +470,13 @@ export default {
           "=" +
           encodeURIComponent(this.$sessionVars.tokenValue)
       )
-      .then(
-      )
+      .then()
       .then(response => {
         this.extObj = response.data;
         this.prevResponses = response.data.responses;
 
         let nowDate = new Date();
-       
+
         if (
           nowDate.toISOString() >= response.data.start &&
           nowDate.toISOString() <= response.data.end
