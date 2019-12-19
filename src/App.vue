@@ -183,6 +183,7 @@ export default {
       debugVars: this.$sessionVars,
       debugMode: false,
       darkMode: false,
+      pageVisible: null
 
       // hiddenNxtPage: null
 
@@ -437,17 +438,20 @@ export default {
       }
     },
     hiddenNxtPage() {
-      return this.extObj.pages
-        .filter(page => page.number == this.rootPage + 1)[0]
-        .questions.filter(question => question.isHiding).length ==
-        this.extObj.pages.filter(page => page.number == this.rootPage + 1)[0]
-          .questions.length;
-          
+      let hidden = true;
+      this.extObj.pages.forEach(page => {
+        page.questions.forEach(question => {
+          if (this.show.includes(question.id)) {
+            hidden = this.rootPage != page.number;
+          } else {
+            hidden = false;
+          }
+        });
+      });
+      return !hidden;
     }
   },
-  computed: {
-    
-  },
+  computed: {},
   mounted() {
     this.$sessionVars.rootPage = parseInt(this.$route.params.rootPage);
     if (this.$route.query.auth) {
