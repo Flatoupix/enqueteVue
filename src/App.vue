@@ -182,8 +182,7 @@ export default {
       errored: false,
       debugVars: this.$sessionVars,
       debugMode: false,
-      darkMode: false,
-      pageVisible: null
+      darkMode: false
 
       // hiddenNxtPage: null
 
@@ -438,17 +437,35 @@ export default {
       }
     },
     hiddenNxtPage() {
-      let hidden = true;
+      //mise a true le variable
+      let hidden = true ;
+ 
+      // pour chaque page on va regarder si elle possède des questions conditionelles
       this.extObj.pages.forEach(page => {
-        page.questions.forEach(question => {
-          if (this.show.includes(question.id)) {
-            hidden = this.rootPage != page.number;
-          } else {
-            hidden = false;
+      
+      // On s'occupe que des pages suivantes
+      if(page.number > this.rootPage){
+      
+      // Pour chaques questions on va regarder s'il une question a afficher
+      page.questions.forEach(question => {
+        if(question.isHiding == false){
+          // s'il existe une question sans affichage conditionnel on affiche 
+          hidden= false;
+          return
+        }
+        else{
+          
+          // Sinon on verifie que la question doit etre affiché grace a la condition
+           if (this.show.includes(question.id)) {
+            if (this.rootPage != page.number) {
+              hidden = false;
+              return;
+            }
           }
-        });
+        }
       });
-      return !hidden;
+    }});
+      return hidden;
     }
   },
   computed: {},

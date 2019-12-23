@@ -6,6 +6,7 @@ import App from "./App";
 import axios from "axios";
 import VueScrollTo from "vue-scrollto";
 import VTooltip from "v-tooltip";
+import { VueReCaptcha } from "vue-recaptcha-v3";
 
 Vue.prototype.$http = axios;
 Vue.use(VTooltip, {
@@ -69,11 +70,13 @@ Vue.prototype.$sessionVars = {
 
   currentTheme: null,
 
-  confirmed: false
+  confirmed: false,
+  buttonNext:null,
+  buttonSubmit:null
 };
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
-
+Vue.use(VueReCaptcha)
 /* eslint-disable no-new */
 new Vue({
   router,
