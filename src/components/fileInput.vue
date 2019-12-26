@@ -139,9 +139,9 @@ export default {
           }
         )
         .then(resp => {
-          this.fileIDs.push(resp.data.reponse.CurrentIdAnnexe);
+          this.$emit('responseInput',resp)
+          this.fileIDs.push(resp.data.reponse.CurrentIdAnnexe)
         })
-        .catch(function() {});
     },
     sendAll(items) {
       items.forEach(item => {

@@ -353,7 +353,6 @@ export default {
         )
         .then(httpresp => {
           // Parcours des pages
-
           this.extObj.pages.forEach(page => {
             // Parcours des questions
             page.questions.forEach(question => {
@@ -372,7 +371,8 @@ export default {
     },
     postCapture(response, id) {
       let serviceLink = "capture?";
-      this.objFormat = response;
+      this.objFormat = response
+      console.log(this.objFormat)
       this.$http
         .post(
           "services/" +
@@ -381,22 +381,54 @@ export default {
             "=" +
             encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
-        )
+        ).then(httpresp => {
+          // Parcours des pages
+          this.extObj.pages.forEach(page => {
+            // Parcours des questions
+            page.questions.forEach(question => {
+              if (question.id == this.objFormat.idQuestion) {
+                if (question.response == null) {
+                  question.response = this.objFormat;
+                }
+                question.response.value = this.objFormat.value;
+              }
+            });
+          });
+
+          this.showQuestion(null);
+        })
         .catch(error => {});
     },
-    postFile(response, id) {
-      let serviceLink = "attachment?";
-      this.objFormat = response;
-      this.$http
-        .post(
-          "services/" +
-            serviceLink +
-            this.$sessionVars.tokenName +
-            "=" +
-            encodeURIComponent(this.$sessionVars.tokenValue),
-          JSON.stringify(this.objFormat)
-        )
-        .catch(error => {});
+    postFile(obj) {
+      console.log(obj.data)
+     this.extObj.pages.forEach(page => {
+            // Parcours des questions
+            page.questions.forEach(question => {
+              if (question.id == obj.data.idQuestion) {
+                if (question.response == null) {
+                  question.response = obj.data.reponse.Annexes;
+                }
+                question.response.value = obj.data.value;
+              }
+            });
+          });
+
+
+
+
+
+      // let serviceLink = "attachment?";
+      // this.objFormat = response;
+      // this.$http
+      //   .post(
+      //     "services/" +
+      //       serviceLink +
+      //       this.$sessionVars.tokenName +
+      //       "=" +
+      //       encodeURIComponent(this.$sessionVars.tokenValue),
+      //     JSON.stringify(this.objFormat)
+      //   )
+      //   .catch(error => {});
     },
     refreshPage(noReload) {
       this.$router.push({

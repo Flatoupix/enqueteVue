@@ -16,7 +16,7 @@ export default {
   props: {
     page: {
       type: Array,
-      default: () => [{}]
+      default: () => []
     },
     rootPage: {
       type: Number,
@@ -25,6 +25,7 @@ export default {
   },
   methods: {
     select(response) {
+     
       if (response.number != this.$sessionVars.rootPage) {
         this.$emit("scan")
         if (
@@ -33,9 +34,9 @@ export default {
         ) {
           this.$sessionVars.rootPage = response.number;
           this.$emit("refresh");
-          this.$scrollTo(pageHolder, 500, {
-            force: false
-          });
+           document.getElementById(this.rootPage).focus();
+
+         
         }
       }
     }
