@@ -5,7 +5,7 @@
       @click="prevPage()"
       class="prevButton"
     >
-      Précédent
+      {{this.$sessionVars.selectedLang.back}}
     </button>
 
     <button
@@ -13,14 +13,14 @@
       @click="nextPage()"
       class="nextButton"
     >
-      Suivant
+      {{this.$sessionVars.selectedLang.next}}
     </button>
     <button
       v-if="$sessionVars.rootPage == pagesNumber || hiddenNxtPage"
       @click="submitForm()"
       class="nextButton validate"
     >
-      Valider
+      {{this.$sessionVars.selectedLang.submit}}
     </button>
   </div>
 </template>

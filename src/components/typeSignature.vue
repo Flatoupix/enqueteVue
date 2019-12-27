@@ -5,14 +5,14 @@
       :saveType="'image/svg+xml'"
       ref="signaturePad"
     />
-    <h4 v-show="$sessionVars.signed">Document signé</h4>
-    <button v-show="!$sessionVars.signed" @click="undo">Retour</button>
+    <h4 v-show="$sessionVars.signed">{{this.$sessionVars.selectedLang.signed}}</h4>
+    <button v-show="!$sessionVars.signed" @click="undo">{{this.$sessionVars.selectedLang.undo}}</button>
     <button
       v-if="!$sessionVars.signed"
       class="saveButton"
       @click="save(question.id)"
     >
-      Signer
+      {{this.$sessionVars.selectedLang.sign}}
     </button>
   </div>
 </template>

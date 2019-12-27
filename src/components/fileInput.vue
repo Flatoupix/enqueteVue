@@ -7,9 +7,9 @@
       {{ msgWarn }}
     </div>
     <label :class="['headLabel', files.length >= 1 ? 'loaded' : '']">
-      <div v-if="files.length == 1">{{ files.length }} fichier chargé</div>
-      <div v-if="files.length >= 2">{{ files.length }} fichiers chargés</div>
-      <div v-else>Ajoutez votre fichier ici</div>
+      <div v-if="files.length == 1">{{ files.length + this.$sessionVars.selectedLang.load}} </div>
+      <div v-if="files.length >= 2">{{ files.length + this.$sessionVars.selectedLang.loads}}</div>
+      <div v-else> {{this.$sessionVars.selectedLang.fileAdd}}</div>
       <input
         type="file"
         id="attachment"
@@ -35,13 +35,13 @@
           :class="['submitGrid', uppedFiles.includes(file.name) ? 'sent' : '']"
         >
           <div class="submitFile">
-            <div @click="submitFile(file.name)">Envoyer</div>
+            <div @click="submitFile(file.name)">{{this.$sessionVars.selectedLang.send}}</div>
             <div @click="deleteFile(index, file.name)" class="deleteFile">
               X
             </div>
           </div>
           <div class="fileActions">
-            <div class="fileSent">Envoyé !</div>
+            <div class="fileSent">{{this.$sessionVars.selectedLang.sent }} !</div>
             <div class="deleteFile" @click="deleteFile(index, file.name)">
               X
             </div>
@@ -60,8 +60,8 @@
     />
     <div class="ieFiles" v-for="file in files" :key="file.id">
       <div>{{ file.name }}</div>
-      <span v-if="uppedFiles.includes(file.name)">Envoyé</span>
-      <button v-else @click="submitFile(file.name)">Envoyer</button>
+      <span v-if="uppedFiles.includes(file.name)">{{this.$sessionVars.selectedLang.sent}}</span>
+      <button v-else @click="submitFile(file.name)">{{this.$sessionVars.selectedLang.send}}</button>
     </div>
   </div>
 </template>
@@ -139,9 +139,9 @@ export default {
           }
         )
         .then(resp => {
-          this.$emit('responseInput',resp)
-          this.fileIDs.push(resp.data.reponse.CurrentIdAnnexe)
-        })
+          this.$emit("responseInput", resp);
+          this.fileIDs.push(resp.data.reponse.CurrentIdAnnexe);
+        });
     },
     sendAll(items) {
       items.forEach(item => {
@@ -190,15 +190,17 @@ export default {
           if (file.size <= this.sizeLimit) {
             this.files.push(file);
           } else {
-            this.msgWarn = "Votre fichier dépasse la taille autorisée de 6 Mo";
+            this.msgWarn = this.$sessionVars.selectedLang.sizeWarning;
             this.sizeWarning = true;
           }
         }
       } else if (this.files.length == this.question.max) {
-        this.msgWarn =
-          "Vous ne pouvez pas ajouter plus de " +
-          this.question.max +
-          " fichiers.";
+        this.question.max;
+        this.msgWarn = this.strSwitch(
+          "%nb",
+          this.question.max,
+          this.$sessionVars.selectedLang.maxFiles
+        );
         this.sizeWarning = true;
       }
     },

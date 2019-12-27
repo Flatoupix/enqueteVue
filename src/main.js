@@ -54,7 +54,9 @@ Vue.use(VueScrollTo, {
   x: false,
   y: true
 });
-
+Vue.prototype.strSwitch = function(pattern, word, sentence) {
+  return sentence.replace(pattern, word);
+};
 Vue.prototype.$sessionVars = {
   urlLocation: window.location.origin,
   tokenName: null,
@@ -71,12 +73,32 @@ Vue.prototype.$sessionVars = {
   currentTheme: null,
 
   confirmed: false,
-  buttonNext:null,
-  buttonSubmit:null
+
+  selectedLang: {
+    Id: 3020719,
+    name: "Default",
+    codeLang: "FR",
+    submit: "Valider",
+    back: "Précédent",
+    next: "Suivant",
+    save: "Enregistrer",
+    sizeWarning: "Votre fichier dépasse la taille autorisée de 6 Mo",
+    send: "Envoyer",
+    sent: "Envoyé",
+    load: "Fichier chargé",
+    loads: "Fichiers chargés",
+    maxFiles: "Vous ne pouvez pas ajouter plus de %nb fichiers",
+    signed:"Document signé",
+    fileAdd:"Ajoutez votre fichier ici",
+    badtoken:"Une erreur est survenue",
+    undo:"Annuler",
+    sign:"Signer"
+  }
+
 };
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
-Vue.use(VueReCaptcha)
+Vue.use(VueReCaptcha);
 /* eslint-disable no-new */
 new Vue({
   router,

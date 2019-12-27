@@ -1,7 +1,7 @@
 <template>
   <div>
-    <vueDatePicker v-tooltip="question.toolTip" :placeholder="question.watermark" :required="question.required" v-if="question.type=='BIRTHDAY'" class="datePickr" :language="fr" :initialView="'year'" @input="select(dateTime,question.id)" v-model="dateTime" />
-    <vueDatePicker v-tooltip="question.toolTip" :placeholder="question.watermark" :required="question.required" v-if="question.type=='DATE'" class="datePickr" :language="fr" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <vueDatePicker v-tooltip="question.toolTip" :placeholder="question.watermark" :required="question.required" v-if="question.type=='BIRTHDAY'" class="datePickr" :language="locales[$sessionVars.selectedLang.codeLang.toLowerCase()]" :initialView="'year'" @input="select(dateTime,question.id)" v-model="dateTime" />
+    <vueDatePicker v-tooltip="question.toolTip" :placeholder="question.watermark" :required="question.required" v-if="question.type=='DATE'" class="datePickr" :language="locales[$sessionVars.selectedLang.codeLang.toLowerCase()]" @input="select(dateTime,question.id)" v-model="dateTime" />
 
   </div>
 </template>
@@ -10,7 +10,7 @@
 
 <script>
 import vueDatePicker from "vuejs-datepicker";
-import { fr } from "vuejs-datepicker/dist/locale";
+import * as locales from "vuejs-datepicker/dist/locale";
 
 export default {
   name: "DatePicker",
@@ -31,7 +31,7 @@ export default {
     }
 
     return {
-      fr: fr,
+      locales:locales,
       dateTime: this.savedChoice
     };
   },

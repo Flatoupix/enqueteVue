@@ -1,9 +1,11 @@
 <template>
   <div id="app" @click.ctrl="darkTime()" :class="darkMode ? 'dark' : ''">
     <div class="badToken" v-if="errored">
-      <h2>Une erreur est survenue.</h2>
+      <h2>{{this.$sessionVars.selectedLang.badtoken}}</h2>
     </div>
+
     <div v-if="loaded && !errored">
+      <lang-bar v-if="lang.length > 1" :languages="lang"></lang-bar>
       <PageButtons
         v-show="!isConfirmed && isOpen && pagesNumber > 1 && !hiddenNxtPage()"
         :page="extObj.pages"
@@ -139,6 +141,7 @@ import typeInput from "./components/typeInput.vue";
 import PageBrowser from "./components/pageBrowser.vue";
 import fileInput from "./components/fileInput.vue";
 import datePickerVue from "./components/datePicker.vue";
+import langBar from "./components/langBar.vue";
 
 export default {
   name: "App",
@@ -154,12 +157,13 @@ export default {
     Range,
     typeInput,
     fileInput,
-    PageBrowser
+    PageBrowser,
+    langBar
   },
   data() {
     return {
       input: null,
-
+      lang: [],
       dateInput: null,
       extObj: {},
       prevResponses: {},
@@ -371,8 +375,8 @@ export default {
     },
     postCapture(response, id) {
       let serviceLink = "capture?";
-      this.objFormat = response
-      console.log(this.objFormat)
+      this.objFormat = response;
+      console.log(this.objFormat);
       this.$http
         .post(
           "services/" +
@@ -381,7 +385,8 @@ export default {
             "=" +
             encodeURIComponent(this.$sessionVars.tokenValue),
           JSON.stringify(this.objFormat)
-        ).then(httpresp => {
+        )
+        .then(httpresp => {
           // Parcours des pages
           this.extObj.pages.forEach(page => {
             // Parcours des questions
@@ -400,22 +405,18 @@ export default {
         .catch(error => {});
     },
     postFile(obj) {
-      console.log(obj.data)
-     this.extObj.pages.forEach(page => {
-            // Parcours des questions
-            page.questions.forEach(question => {
-              if (question.id == obj.data.idQuestion) {
-                if (question.response == null) {
-                  question.response = obj.data.reponse.Annexes;
-                }
-                question.response.value = obj.data.value;
-              }
-            });
-          });
-
-
-
-
+      console.log(obj.data);
+      this.extObj.pages.forEach(page => {
+        // Parcours des questions
+        page.questions.forEach(question => {
+          if (question.id == obj.data.idQuestion) {
+            if (question.response == null) {
+              question.response = obj.data.reponse.Annexes;
+            }
+            question.response.value = obj.data.value;
+          }
+        });
+      });
 
       // let serviceLink = "attachment?";
       // this.objFormat = response;
@@ -470,33 +471,30 @@ export default {
     },
     hiddenNxtPage() {
       //mise a true le variable
-      let hidden = true ;
- 
+      let hidden = true;
+
       // pour chaque page on va regarder si elle possède des questions conditionelles
       this.extObj.pages.forEach(page => {
-      
-      // On s'occupe que des pages suivantes
-      if(page.number > this.rootPage){
-      
-      // Pour chaques questions on va regarder s'il une question a afficher
-      page.questions.forEach(question => {
-        if(question.isHiding == false){
-          // s'il existe une question sans affichage conditionnel on affiche 
-          hidden= false;
-          return
-        }
-        else{
-          
-          // Sinon on verifie que la question doit etre affiché grace a la condition
-           if (this.show.includes(question.id)) {
-            if (this.rootPage != page.number) {
+        // On s'occupe que des pages suivantes
+        if (page.number > this.rootPage) {
+          // Pour chaques questions on va regarder s'il une question a afficher
+          page.questions.forEach(question => {
+            if (question.isHiding == false) {
+              // s'il existe une question sans affichage conditionnel on affiche
               hidden = false;
               return;
+            } else {
+              // Sinon on verifie que la question doit etre affiché grace a la condition
+              if (this.show.includes(question.id)) {
+                if (this.rootPage != page.number) {
+                  hidden = false;
+                  return;
+                }
+              }
             }
-          }
+          });
         }
       });
-    }});
       return hidden;
     }
   },
@@ -526,6 +524,17 @@ export default {
       .then()
       .then(response => {
         this.extObj = response.data;
+
+        //Définition de la langue de navigation
+        if(response.data.languages) {
+          if (response.data.languages.length == 1) {
+            this.$sessionVars.selectedLang = response.data.languages[0];
+          } else if (response.data.languages.length > 1){
+            this.lang = response.data.languages;
+          }
+        }
+
+        
         this.prevResponses = response.data.responses;
 
         let nowDate = new Date();
