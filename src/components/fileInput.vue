@@ -7,9 +7,9 @@
       {{ msgWarn }}
     </div>
     <label :class="['headLabel', files.length >= 1 ? 'loaded' : '']">
-      <div v-if="files.length == 1">{{ files.length + this.$sessionVars.selectedLang.load}} </div>
-      <div v-if="files.length >= 2">{{ files.length + this.$sessionVars.selectedLang.loads}}</div>
-      <div v-else> {{this.$sessionVars.selectedLang.fileAdd}}</div>
+      <div v-if="files.length == 1">{{ files.length + ' ' + $sessionVars.selectedLang.load}} </div>
+      <div v-if="files.length >= 2">{{ files.length + ' '+$sessionVars.selectedLang.loads}}</div>
+      <div v-else> {{$sessionVars.selectedLang.fileAdd}}</div>
       <input
         type="file"
         id="attachment"
@@ -35,13 +35,13 @@
           :class="['submitGrid', uppedFiles.includes(file.name) ? 'sent' : '']"
         >
           <div class="submitFile">
-            <div @click="submitFile(file.name)">{{this.$sessionVars.selectedLang.send}}</div>
+            <div @click="submitFile(file.name)">{{$sessionVars.selectedLang.send}}</div>
             <div @click="deleteFile(index, file.name)" class="deleteFile">
               X
             </div>
           </div>
           <div class="fileActions">
-            <div class="fileSent">{{this.$sessionVars.selectedLang.sent }} !</div>
+            <div class="fileSent">{{$sessionVars.selectedLang.sent }} !</div>
             <div class="deleteFile" @click="deleteFile(index, file.name)">
               X
             </div>
@@ -60,8 +60,8 @@
     />
     <div class="ieFiles" v-for="file in files" :key="file.id">
       <div>{{ file.name }}</div>
-      <span v-if="uppedFiles.includes(file.name)">{{this.$sessionVars.selectedLang.sent}}</span>
-      <button v-else @click="submitFile(file.name)">{{this.$sessionVars.selectedLang.send}}</button>
+      <span v-if="uppedFiles.includes(file.name)">{{$sessionVars.selectedLang.sent}}</span>
+      <button v-else @click="submitFile(file.name)">{{$sessionVars.selectedLang.send}}</button>
     </div>
   </div>
 </template>
